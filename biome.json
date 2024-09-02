@@ -1,0 +1,21 @@
+{
+    "files": {
+        "include": ["biome.json", "src/**/*.js"],
+        "ignore": [".git"]
+    },
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "defaultBranch": "main",
+        "useIgnoreFile": true
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 90
+    },
+    "assists": { "enabled": false },
+    "linter": { "enabled": false },
+    "organizeImports": { "enabled": false }
+}
