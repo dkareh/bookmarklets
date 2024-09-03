@@ -66,14 +66,26 @@ const Export = struct {
         try self.writer.writeAll("</A>\n      </DT>\n");
     }
 
+    // https://html.spec.whatwg.org/multipage/parsing.html#data-state
     fn exportName(self: Export, name: []const u8) !void {
-        // FIXME: Escape opening angle brackets and ampersands.
-        try self.writer.writeAll(name);
+        var remaining = name;
+        while (std.mem.indexOfAny(u8, remaining, "&<")) |index| {
+            try self.writer.writeAll(remaining[0..index]);
+            try self.writer.print("&#x{X};", .{remaining[index]});
+            remaining = remaining[index + 1 ..];
+        }
+        try self.writer.writeAll(remaining);
     }
 
+    // https://html.spec.whatwg.org/multipage/parsing.html#attribute-value-(double-quoted)-state
     fn exportLink(self: Export, link: []const u8) !void {
-        // FIXME: Escape double quotes and ampersands.
-        try self.writer.writeAll(link);
+        var remaining = link;
+        while (std.mem.indexOfAny(u8, remaining, "\"&")) |index| {
+            try self.writer.writeAll(remaining[0..index]);
+            try self.writer.print("&#x{X};", .{remaining[index]});
+            remaining = remaining[index + 1 ..];
+        }
+        try self.writer.writeAll(remaining);
     }
 
     const header =
