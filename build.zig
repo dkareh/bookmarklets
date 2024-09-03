@@ -22,6 +22,13 @@ pub fn build(b: *Build) !void {
         .optimize = .ReleaseSafe,
     });
 
+    const export_exe = b.addExecutable(.{
+        .name = "export",
+        .root_source_file = b.path("build/export.zig"),
+        .target = b.graph.host,
+        .optimize = .ReleaseSafe,
+    });
+
     // NOTE: Using `addWriteFiles` will bloat the cache directory, but
     // eventually I want to do additional processing on the bookmarklets, so
     // `addWriteFiles` is the correct choice.
@@ -49,4 +56,11 @@ pub fn build(b: *Build) !void {
         const output_path = generate_run.captureStdOut();
         _ = bookmarklets.addCopyFile(output_path, entry.path);
     }
+
+    const export_run = b.addRunArtifact(export_exe);
+    export_run.addDirectoryArg(bookmarklets.getDirectory());
+
+    const html_path = export_run.captureStdOut();
+    const install_html = b.addInstallFile(html_path, "bookmarks.html");
+    b.getInstallStep().dependOn(&install_html.step);
 }
