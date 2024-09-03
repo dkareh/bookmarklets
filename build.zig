@@ -2,6 +2,12 @@ const std = @import("std");
 const Build = std.Build;
 
 pub fn build(b: *Build) !void {
+    const fmt_step = b.step("fmt", "Format Zig source files");
+    fmt_step.dependOn(&b.addFmt(.{ .paths = &.{"."} }).step);
+
+    const test_fmt_step = b.step("test-fmt", "Check formatting of Zig source files");
+    test_fmt_step.dependOn(&b.addFmt(.{ .paths = &.{"."}, .check = true }).step);
+
     const generate_exe = b.addExecutable(.{
         .name = "generate",
         .root_source_file = b.path("build/generate.zig"),
