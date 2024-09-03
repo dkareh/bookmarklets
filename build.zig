@@ -2,11 +2,18 @@ const std = @import("std");
 const Build = std.Build;
 
 pub fn build(b: *Build) !void {
-    const fmt_step = b.step("fmt", "Format Zig source files");
+    const fmt_step = b.step("fmt", "Format source files");
     fmt_step.dependOn(&b.addFmt(.{ .paths = &.{"."} }).step);
 
-    const test_fmt_step = b.step("test-fmt", "Check formatting of Zig source files");
+    const test_fmt_step = b.step("test-fmt", "Check formatting of source files");
     test_fmt_step.dependOn(&b.addFmt(.{ .paths = &.{"."}, .check = true }).step);
+
+    if (b.findProgram(&.{"biome"}, &.{})) |biome| {
+        fmt_step.dependOn(&b.addSystemCommand(&.{ biome, "format", "--fix" }).step);
+        test_fmt_step.dependOn(&b.addSystemCommand(&.{ biome, "format" }).step);
+    } else |_| {
+        // Don't quit just because the user hasn't installed Biome.
+    }
 
     const generate_exe = b.addExecutable(.{
         .name = "generate",
