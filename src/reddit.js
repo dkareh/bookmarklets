@@ -1,6 +1,7 @@
 (() => {
     // Normalize subreddit and user names.
     const name = prompt("Enter subreddit name or 'u/<username>':")
+        .replaceAll("\\", "/")
         .replace(/^[ /]+/, "")
         .toLowerCase();
     // Don't add a prefix if the name already includes one.
