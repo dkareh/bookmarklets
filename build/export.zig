@@ -71,7 +71,7 @@ const Export = struct {
         var remaining = name;
         while (std.mem.indexOfAny(u8, remaining, "&<")) |index| {
             try self.writer.writeAll(remaining[0..index]);
-            try self.writer.print("&#x{X};", .{remaining[index]});
+            try self.writer.writeAll(htmlEscape(remaining[index]));
             remaining = remaining[index + 1 ..];
         }
         try self.writer.writeAll(remaining);
@@ -82,10 +82,21 @@ const Export = struct {
         var remaining = link;
         while (std.mem.indexOfAny(u8, remaining, "\"&")) |index| {
             try self.writer.writeAll(remaining[0..index]);
-            try self.writer.print("&#x{X};", .{remaining[index]});
+            try self.writer.writeAll(htmlEscape(remaining[index]));
             remaining = remaining[index + 1 ..];
         }
         try self.writer.writeAll(remaining);
+    }
+
+    // Only return character references that Chromium can correctly unescape.
+    // https://chromium.googlesource.com/chromium/src.git/+/a63238f367/base/strings/escape.cc#627
+    fn htmlEscape(byte: u8) []const u8 {
+        return switch (byte) {
+            '&' => "&amp;",
+            '<' => "&lt;",
+            '"' => "&quot;",
+            else => unreachable,
+        };
     }
 
     const header =
