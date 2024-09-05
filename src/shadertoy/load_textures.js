@@ -14,7 +14,7 @@
         // Create the file input.
         const input = document.createElement("input");
         input.type = "file";
-        input.accept = "image/*";
+        input.accept = "image/*,video/*,audio/*";
         input.style.background = "#b0b0b0";
         input.style.borderRadius = "0 0 4px 4px";
         input.style.height = "min-content";
@@ -40,11 +40,19 @@
         const url = URL.createObjectURL(files[0]);
         objectUrls[slot] = url;
 
+        // Determine the texture type, defaulting to "texture" for images and
+        // unknown MIME types. ("texture" is kind of a misnomer; all of these
+        // resource types are converted to textures on the GPU in some way).
+        const mimeType = files[0].type.toLowerCase();
+        let mType = "texture";
+        if (mimeType.startsWith("video/")) mType = "video";
+        if (mimeType.startsWith("audio/")) mType = "music";
+
         // Preserve previous sampler properties.
         const previousTexture = gShaderToy.GetTexture(slot);
         const mSampler = previousTexture?.mSampler ?? { vflip: "true" };
         gShaderToy.SetTexture(slot, {
-            mType: "texture",
+            mType,
             mID: -1,
             mSrc: url,
             mPreviewSrc: url,
