@@ -22,6 +22,9 @@
         const inputSelector = document.getElementById(`texture${slot}`);
         if (!inputSelector) continue;
 
+        // Don't add the file input twice.
+        if (inputSelector.querySelector(`input[type="file"]`)) continue;
+
         // Create the file input.
         const input = document.createElement("input");
         input.type = "file";
