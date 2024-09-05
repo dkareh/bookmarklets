@@ -2,20 +2,6 @@
 (async () => {
     if (location.hostname != "www.shadertoy.com") return;
 
-    // Fetch Shadertoy's default textures.
-    const response = await fetch("https://www.shadertoy.com/shadertoy", {
-        method: "POST",
-        body: "mga=1&type=texture",
-        headers: {
-            Accept: "application/json",
-            "Content-Type": "application/x-www-form-urlencoded",
-        },
-    });
-
-    // Borrow sampler properties from the 1st texture.
-    const textures = await response.json();
-    const defaultSampler = textures.sampler[0];
-
     // Place a file input under each input selector.
     const SLOT_COUNT = 4;
     for (let slot = 0; slot < SLOT_COUNT; slot++) {
@@ -56,7 +42,7 @@
 
         // Preserve previous sampler properties.
         const previousTexture = gShaderToy.GetTexture(slot);
-        const mSampler = previousTexture?.mSampler ?? defaultSampler;
+        const mSampler = previousTexture?.mSampler ?? { vflip: "true" };
         gShaderToy.SetTexture(slot, {
             mType: "texture",
             mID: -1,
