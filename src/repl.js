@@ -36,8 +36,23 @@
 
         // Output all slots, including empty slots.
         const slots = [];
+        let emptySlotCount = 0;
         for (let i = 0; i < array.length; ++i) {
-            slots[i] = i in array ? inspect(array[i]) : "<empty>";
+            if (!(i in array)) {
+                emptySlotCount++;
+                continue;
+            }
+            if (emptySlotCount > 0) {
+                const suffix = emptySlotCount > 1 ? "s" : "";
+                slots.push(`<${emptySlotCount} empty slot${suffix}>`);
+                emptySlotCount = 0;
+            }
+            slots.push(inspect(array[i]));
+        }
+        // Output empty slots at the end of the array.
+        if (emptySlotCount > 0) {
+            const suffix = emptySlotCount > 1 ? "s" : "";
+            slots.push(`<${emptySlotCount} empty slot${suffix}>`);
         }
         return `[ ${slots.join(", ")} ]`;
     }
