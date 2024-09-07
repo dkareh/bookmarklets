@@ -5,8 +5,8 @@
         function: (func) => func.toString(),
         number: (number) => number.toString(),
         object: inspectObject,
-        string: (string) => string.toString(),
-        symbol: (symbol) => symbol.toString(),
+        string: (string) => quote(string),
+        symbol: (symbol) => `Symbol(${quote(symbol.description)})`,
         undefined: () => "undefined",
     };
 
@@ -27,7 +27,7 @@
     }
 
     function inspectProp([key, value]) {
-        return `${key}: ${inspect(value)}`;
+        return `${quoteKeyIfNeeded(key)}: ${inspect(value)}`;
     }
 
     function inspectArray(array) {
@@ -40,6 +40,28 @@
             slots[i] = i in array ? inspect(array[i]) : "<empty>";
         }
         return `[ ${slots.join(", ")} ]`;
+    }
+
+    const escapeSequences = new Map([
+        ['"', '\\"'],
+        ["\\", "\\\\"],
+        ["\n", "\\n"],
+        ["\r", "\\r"],
+    ]);
+
+    function quote(string) {
+        return `"${escape(string)}"`;
+    }
+
+    function escape(string) {
+        return [...string]
+            .map((codePoint) => escapeSequences.get(codePoint) ?? codePoint)
+            .join("");
+    }
+
+    function quoteKeyIfNeeded(key) {
+        const identifier = /^[\p{ID_Start}$_][\p{ID_Continue}$]*$/u;
+        return identifier.test(key) ? key : quote(key);
     }
 
     for (let code = `[..."Hello! \\u{1F600}"].join("·")`; ; ) {
