@@ -1,6 +1,7 @@
 // Based on a comment by @johnao under https://www.shadertoy.com/view/lsGGDd
 (async () => {
     if (location.hostname != "www.shadertoy.com") return;
+    const DARK = gThemeName == "dark";
 
     // Place a file input under each input selector.
     const SLOT_COUNT = 4;
@@ -11,19 +12,22 @@
         // Don't add the file input twice.
         if (inputSelector.querySelector(`input[type="file"]`)) continue;
 
+        inputSelector.style.background = "none";
+        inputSelector.style.height = "min-content";
+
         // Create the file input.
         const input = document.createElement("input");
         input.type = "file";
         input.accept = "image/*,video/*,audio/*";
-        input.style.background = "#b0b0b0";
+        input.style.background = DARK ? "#404040" : "#b0b0b0";
         input.style.borderRadius = "0 0 4px 4px";
+        input.style.color = DARK ? "#b0b0b0" : "#000";
         input.style.height = "min-content";
         input.style.maxWidth = "100%";
         input.style.minWidth = "100%";
         input.style.width = "100%";
         input.style.padding = "4px";
         inputSelector.append(input);
-        inputSelector.style.background = "none";
 
         const updateCurrentTexture = updateTexture.bind(null, slot);
         input.addEventListener("change", updateCurrentTexture);
