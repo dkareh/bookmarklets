@@ -50,7 +50,7 @@ pub fn build(b: *Build) !void {
             continue;
 
         const generate_run = b.addRunArtifact(generate_exe);
-        const source_path = try b.path("src").join(b.allocator, entry.path);
+        const source_path = b.path("src").path(b, entry.path);
         generate_run.addFileArg(source_path);
 
         const output_path = generate_run.captureStdOut();
