@@ -2,6 +2,13 @@ const std = @import("std");
 const Build = std.Build;
 
 pub fn build(b: *Build) !void {
+    const ziggy_dep = b.dependency("ziggy", .{
+        .target = b.graph.host,
+        .optimize = .ReleaseSafe,
+    });
+
+    const ziggy_mod = ziggy_dep.module("ziggy");
+
     const fmt_step = b.step("fmt", "Format source files");
     fmt_step.dependOn(&b.addFmt(.{ .paths = &.{"."} }).step);
 
@@ -28,6 +35,7 @@ pub fn build(b: *Build) !void {
         .target = b.graph.host,
         .optimize = .ReleaseSafe,
     });
+    export_exe.root_module.addImport("ziggy", ziggy_mod);
 
     // NOTE: Using `addWriteFiles` will bloat the cache directory, but
     // eventually I want to do additional processing on the bookmarklets, so
@@ -59,6 +67,7 @@ pub fn build(b: *Build) !void {
 
     const export_run = b.addRunArtifact(export_exe);
     export_run.addDirectoryArg(bookmarklets.getDirectory());
+    export_run.addFileArg(b.path("meta/bookmarklets.ziggy"));
 
     const html_path = export_run.captureStdOut();
     const install_html = b.addInstallFile(html_path, "bookmarks.html");

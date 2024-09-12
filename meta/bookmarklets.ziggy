@@ -1,0 +1,9 @@
+//! All bookmarklets under 'src/' are processed and included in output files
+//! such as 'bookmarks.html'. The files mentioned here just have additional
+//! metadata attached to them.
+
+.items = {
+    "clear_timers.js": Bookmarklet { .title = "Clear Timers" },
+    "discord": Folder { .title = "Discord" },
+    "reddit.js": Bookmarklet { .title = "Reddit" },
+},

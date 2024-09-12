@@ -1,0 +1,16 @@
+root = Bookmarklets
+
+
+/// Any changes must be reflected in 'build/export.zig'.
+struct Bookmarklets {
+    items: map[Folder | Bookmarklet],
+}
+
+struct Folder {
+    title: bytes,
+    items: ?map[Folder | Bookmarklet],
+}
+
+struct Bookmarklet {
+    title: bytes,
+}

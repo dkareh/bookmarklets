@@ -1,0 +1,17 @@
+.{
+    .name = "bookmarklets",
+    .version = "0.0.0",
+    .minimum_zig_version = "0.13.0",
+    .dependencies = .{
+        .ziggy = .{
+            .url = "https://github.com/kristoff-it/ziggy/archive/c66f47bc632c66668d61fa06eda112b41d6e5130.tar.gz",
+            .hash = "1220115ff095a3c970cc90fce115294ba67d6fbc4927472dc856abc51e2a1a9364d7",
+        },
+    },
+    .paths = .{
+        "build",
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

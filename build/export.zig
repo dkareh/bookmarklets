@@ -1,5 +1,7 @@
 const std = @import("std");
 const fs = std.fs;
+const ziggy = @import("ziggy");
+const Map = ziggy.dynamic.Map;
 
 pub fn main() !void {
     var arena_state = std.heap.ArenaAllocator.init(std.heap.page_allocator);
@@ -12,24 +14,75 @@ pub fn main() !void {
         return error.NoRootPath;
     };
 
+    // Read the bookmarklets metadata.
+    const metadata = if (args.len > 2) blk: {
+        const metadata_path = args[2];
+        const max_bytes = std.math.maxInt(usize);
+        const code = try fs.cwd().readFileAllocOptions(
+            arena,
+            metadata_path,
+            max_bytes,
+            null,
+            1,
+            0,
+        );
+        break :blk try ziggy.parseLeaky(Bookmarklets, arena, code, .{});
+    } else null;
+
     const direct_writer = std.io.getStdOut().writer();
     var buffered_writer = std.io.bufferedWriter(direct_writer);
     const writer = buffered_writer.writer();
-    try exportTree(arena, writer.any(), root_path);
+    try exportTree(arena, writer.any(), root_path, metadata);
     try buffered_writer.flush();
 }
+
+// Any changes must be reflected in 'meta/bookmarklets.ziggy-schema'.
+const Bookmarklets = struct {
+    items: Map(Item),
+};
+
+const Item = union(enum) {
+    Folder: Folder,
+    Bookmarklet: Bookmarklet,
+};
+
+const Folder = struct {
+    title: []const u8,
+    items: Map(Item) = .{},
+
+    pub fn from(maybe_item: ?Item) !?Folder {
+        const item = maybe_item orelse return null;
+        return switch (item) {
+            .Folder => |folder| folder,
+            else => error.ExpectedFolder,
+        };
+    }
+};
+
+const Bookmarklet = struct {
+    title: []const u8,
+
+    pub fn from(maybe_item: ?Item) !?Bookmarklet {
+        const item = maybe_item orelse return null;
+        return switch (item) {
+            .Bookmarklet => |bookmarklet| bookmarklet,
+            else => error.ExpectedBookmarklet,
+        };
+    }
+};
 
 fn exportTree(
     arena: std.mem.Allocator,
     writer: std.io.AnyWriter,
     root_path: []const u8,
+    metadata: ?Bookmarklets,
 ) !void {
     var exporter: Export = .{
         .arena = arena,
         .writer = writer,
         .root_path = root_path,
     };
-    try exporter.exportRoot();
+    try exporter.exportRoot(metadata);
 }
 
 const Export = struct {
@@ -37,45 +90,51 @@ const Export = struct {
     writer: std.io.AnyWriter,
     root_path: []const u8,
 
-    pub fn exportRoot(self: Export) !void {
+    pub fn exportRoot(self: Export, metadata: ?Bookmarklets) !void {
         try self.writer.writeAll(header);
-        try self.exportSubDir(fs.cwd(), self.root_path, "Bookmarklets");
+        try self.exportSubDir(fs.cwd(), self.root_path, .{
+            .title = "Bookmarklets",
+            .items = if (metadata) |m| m.items else .{},
+        });
         try self.writer.writeAll(footer);
     }
 
     const Error = anyerror;
 
     // FIXME: Indent HTML correctly.
-    fn exportSubDir(self: Export, dir: fs.Dir, path: []const u8, name: []const u8) Error!void {
+    fn exportSubDir(self: Export, dir: fs.Dir, path: []const u8, metadata: ?Folder) Error!void {
         var sub_dir = try dir.openDir(path, .{ .iterate = true });
         defer sub_dir.close();
 
         try self.writer.writeAll("  <DT>\n    <H3>");
-        try self.exportName(name);
+        try self.exportName(if (metadata) |m| m.title else path);
         try self.writer.writeAll("</H3>\n    <DL>\n");
-        try self.exportDir(sub_dir);
+        try self.exportDir(sub_dir, if (metadata) |m| m.items else .{});
         try self.writer.writeAll("    </DL>\n  </DT>\n");
     }
 
-    fn exportDir(self: Export, dir: fs.Dir) !void {
+    fn exportDir(self: Export, dir: fs.Dir, items: Map(Item)) !void {
         var iterator = dir.iterate();
+        const fields = items.fields;
         while (try iterator.next()) |entry| {
+            const name = entry.name;
+            const metadata = fields.get(name);
             switch (entry.kind) {
-                .directory => try self.exportSubDir(dir, entry.name, entry.name),
-                .file => try self.exportFile(dir, entry.name),
+                .directory => try self.exportSubDir(dir, name, try Folder.from(metadata)),
+                .file => try self.exportFile(dir, name, try Bookmarklet.from(metadata)),
                 else => continue,
             }
         }
     }
 
     // FIXME: Indent HTML correctly.
-    fn exportFile(self: Export, dir: fs.Dir, path: []const u8) !void {
+    fn exportFile(self: Export, dir: fs.Dir, path: []const u8, metadata: ?Bookmarklet) !void {
         const max_bytes = std.math.maxInt(usize);
         const link = try dir.readFileAlloc(self.arena, path, max_bytes);
         try self.writer.writeAll("      <DT>\n        <A HREF=\"");
         try self.exportLink(link);
         try self.writer.writeAll("\">");
-        try self.exportName(path);
+        try self.exportName(if (metadata) |m| m.title else path);
         try self.writer.writeAll("</A>\n      </DT>\n");
     }
 
