@@ -12,25 +12,22 @@ pub fn main() !void {
         return error.NoRootPath;
     };
 
-    var root_dir = try fs.cwd().openDir(root_path, .{ .iterate = true });
-    defer root_dir.close();
-
     const direct_writer = std.io.getStdOut().writer();
     var buffered_writer = std.io.bufferedWriter(direct_writer);
     const writer = buffered_writer.writer();
-    try exportTree(arena, writer.any(), root_dir);
+    try exportTree(arena, writer.any(), root_path);
     try buffered_writer.flush();
 }
 
 fn exportTree(
     arena: std.mem.Allocator,
     writer: std.io.AnyWriter,
-    root_dir: fs.Dir,
+    root_path: []const u8,
 ) !void {
     var exporter: Export = .{
         .arena = arena,
         .writer = writer,
-        .root_dir = root_dir,
+        .root_path = root_path,
     };
     try exporter.exportRoot();
 }
@@ -38,24 +35,40 @@ fn exportTree(
 const Export = struct {
     arena: std.mem.Allocator,
     writer: std.io.AnyWriter,
-    root_dir: fs.Dir,
+    root_path: []const u8,
 
     pub fn exportRoot(self: Export) !void {
         try self.writer.writeAll(header);
-        try self.exportDir(self.root_dir);
+        try self.exportSubDir(fs.cwd(), self.root_path, "Bookmarklets");
         try self.writer.writeAll(footer);
     }
 
+    const Error = anyerror;
+
+    // FIXME: Indent HTML correctly.
+    fn exportSubDir(self: Export, dir: fs.Dir, path: []const u8, name: []const u8) Error!void {
+        var sub_dir = try dir.openDir(path, .{ .iterate = true });
+        defer sub_dir.close();
+
+        try self.writer.writeAll("  <DT>\n    <H3>");
+        try self.exportName(name);
+        try self.writer.writeAll("</H3>\n    <DL>\n");
+        try self.exportDir(sub_dir);
+        try self.writer.writeAll("    </DL>\n  </DT>\n");
+    }
+
     fn exportDir(self: Export, dir: fs.Dir) !void {
-        var walker = try dir.walk(self.arena);
-        defer walker.deinit();
-        while (try walker.next()) |entry| {
-            if (entry.kind != .file)
-                continue;
-            try self.exportFile(dir, entry.path);
+        var iterator = dir.iterate();
+        while (try iterator.next()) |entry| {
+            switch (entry.kind) {
+                .directory => try self.exportSubDir(dir, entry.name, entry.name),
+                .file => try self.exportFile(dir, entry.name),
+                else => continue,
+            }
         }
     }
 
+    // FIXME: Indent HTML correctly.
     fn exportFile(self: Export, dir: fs.Dir, path: []const u8) !void {
         const max_bytes = std.math.maxInt(usize);
         const link = try dir.readFileAlloc(self.arena, path, max_bytes);
@@ -103,15 +116,10 @@ const Export = struct {
         \\<!DOCTYPE NETSCAPE-Bookmark-file-1>
         \\<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" />
         \\<DL>
-        \\  <DT>
-        \\    <H3>Bookmarklets</H3>
-        \\    <DL>
         \\
     ;
 
     const footer =
-        \\    </DL>
-        \\  </DT>
         \\</DL>
     ;
 };
