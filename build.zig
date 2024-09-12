@@ -6,14 +6,23 @@ pub fn build(b: *Build) !void {
         .target = b.graph.host,
         .optimize = .ReleaseSafe,
     });
-
+    const ziggy_exe = ziggy_dep.artifact("ziggy");
     const ziggy_mod = ziggy_dep.module("ziggy");
+    const schema = "meta/bookmarklets.ziggy-schema";
 
     const fmt_step = b.step("fmt", "Format source files");
     fmt_step.dependOn(&b.addFmt(.{ .paths = &.{"."} }).step);
 
+    const ziggy_fmt_run = b.addRunArtifact(ziggy_exe);
+    ziggy_fmt_run.addArgs(&.{ "fmt", "--schema", schema, "meta" });
+    fmt_step.dependOn(&ziggy_fmt_run.step);
+
     const test_fmt_step = b.step("test-fmt", "Check formatting of source files");
     test_fmt_step.dependOn(&b.addFmt(.{ .paths = &.{"."}, .check = true }).step);
+
+    const ziggy_check_fmt_run = b.addRunArtifact(ziggy_exe);
+    ziggy_check_fmt_run.addArgs(&.{ "fmt", "--check", "--schema", schema, "meta" });
+    test_fmt_step.dependOn(&ziggy_check_fmt_run.step);
 
     if (b.findProgram(&.{"biome"}, &.{})) |biome| {
         fmt_step.dependOn(&b.addSystemCommand(&.{ biome, "format", "--fix" }).step);
