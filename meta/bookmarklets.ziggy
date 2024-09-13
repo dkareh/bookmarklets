@@ -4,6 +4,42 @@
 
 .items = {
     "clear_timers.js": Bookmarklet { .title = "Clear Timers" },
-    "discord": Folder { .title = "Discord" },
+    "deepl": Folder {
+        .title = "DeepL",
+        .items = {
+            "translate.js": Bookmarklet { .title = "Translate" },
+            "translate_selection.js": Bookmarklet { .title = "Translate Selection" },
+        },
+    },
+    "discord": Folder {
+        .title = "Discord",
+        .items = {
+            "decode_snowflake.js": Bookmarklet { .title = "Decode Snowflake" },
+        },
+    },
+    "google": Folder {
+        .title = "Google",
+        .items = {
+            "translate.js": Bookmarklet { .title = "Translate" },
+            "translate_page.js": Bookmarklet { .title = "Translate Page" },
+            "translate_selection.js": Bookmarklet { .title = "Translate Selection" },
+        },
+    },
     "reddit.js": Bookmarklet { .title = "Reddit" },
+    "repl.js": Bookmarklet { .title = "REPL" },
+    "sci_hub": Folder {
+        .title = "Sci-Hub",
+        .items = {
+            "random_mirror.js": Bookmarklet { .title = "Random Mirror" },
+            "sci_hub_ru.js": Bookmarklet { .title = "Sci-Hub (ru)" },
+            "sci_hub_se.js": Bookmarklet { .title = "Sci-Hub (se)" },
+            "sci_hub_st.js": Bookmarklet { .title = "Sci-Hub (st)" },
+        },
+    },
+    "shadertoy": Folder {
+        .title = "Shadertoy",
+        .items = {
+            "load_textures.js": Bookmarklet { .title = "Load Textures" },
+        },
+    },
 },
