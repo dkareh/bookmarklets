@@ -98,16 +98,21 @@ const Export = struct {
     arena: std.mem.Allocator,
     writer: std.io.AnyWriter,
     root_path: []const u8,
-    nesting_level: usize = initial_nesting_level,
-    state: State = initial_state,
+    nesting_level: usize = 0,
+    state: State = .begin_data,
 
     pub fn exportRoot(self: *Export, metadata: ?Bookmarklets) !void {
-        try self.writer.writeAll(header);
+        try self.emitDoctype();
+        try self.openTagAndAttributes("META");
+        try self.attribute("HTTP-EQUIV", "Content-Type");
+        try self.attribute("CONTENT", "text/html; charset=UTF-8");
+        try self.finishSelfClosing();
+        try self.openTag("DL");
         try self.exportDir(fs.cwd(), self.root_path, .{
             .title = "Bookmarklets",
             .items = if (metadata) |m| m.items else .{},
         });
-        try self.writer.writeAll(footer);
+        try self.closeTag("DL");
     }
 
     const Error = anyerror;
@@ -168,6 +173,12 @@ const Export = struct {
     }
 
     /// Assumes that `name` is a legal HTML tag name.
+    fn openSelfClosingTag(self: *Export, name: []const u8) !void {
+        try self.openTagAndAttributes(name);
+        try self.finishSelfClosing();
+    }
+
+    /// Assumes that `name` is a legal HTML tag name.
     fn openTagAndAttributes(self: *Export, name: []const u8) !void {
         assert(self.stateIsOneOf(&.{ .begin_data, .in_internal_element }));
         try self.nextLine();
@@ -200,6 +211,17 @@ const Export = struct {
         assert(self.state == .in_attributes);
         try self.writer.writeByte('>');
         self.state = .begin_data;
+    }
+
+    fn finishSelfClosing(self: *Export) !void {
+        assert(self.state == .in_attributes);
+        try self.writer.writeAll(" />");
+        self.nesting_level -= 1;
+        self.state = .in_internal_element;
+    }
+
+    fn emitDoctype(self: *Export) !void {
+        try self.writer.writeAll("<!DOCTYPE NETSCAPE-Bookmark-file-1>");
     }
 
     fn data(self: *Export, bytes: []const u8) !void {
@@ -240,19 +262,4 @@ const Export = struct {
             else => unreachable,
         };
     }
-
-    // Initially, there's only one open element: `<DL>`.
-    const initial_nesting_level = 1;
-    const initial_state: State = .begin_data;
-
-    const header =
-        \\<!DOCTYPE NETSCAPE-Bookmark-file-1>
-        \\<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8" />
-        \\<DL>
-    ;
-
-    const footer =
-        \\
-        \\</DL>
-    ;
 };
