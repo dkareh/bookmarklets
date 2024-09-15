@@ -103,6 +103,7 @@ const Export = struct {
 
     pub fn exportRoot(self: *Export, metadata: ?Bookmarklets) !void {
         try self.emitDoctype();
+        try self.emitGeneratedFileWarning();
         try self.openTagAndAttributes("META");
         try self.attribute("HTTP-EQUIV", "Content-Type");
         try self.attribute("CONTENT", "text/html; charset=UTF-8");
@@ -222,6 +223,10 @@ const Export = struct {
 
     fn emitDoctype(self: *Export) !void {
         try self.writer.writeAll("<!DOCTYPE NETSCAPE-Bookmark-file-1>");
+    }
+
+    fn emitGeneratedFileWarning(self: *Export) !void {
+        try self.writer.writeAll("\n<!-- This is a generated file! -->");
     }
 
     fn data(self: *Export, bytes: []const u8) !void {
