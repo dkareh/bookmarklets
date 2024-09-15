@@ -25,6 +25,12 @@
             "translate_selection.js": Bookmarklet { .title = "Translate Selection" },
         },
     },
+    "qobuz": Folder {
+        .title = "Qobuz",
+        .items = {
+            "download_all_tracks.js": Bookmarklet { .title = "Download All Tracks" },
+        },
+    },
     "reddit.js": Bookmarklet { .title = "Reddit" },
     "repl.js": Bookmarklet { .title = "REPL" },
     "sci_hub": Folder {
