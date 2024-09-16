@@ -81,9 +81,8 @@ fn exportTree(
     var exporter: Export = .{
         .arena = arena,
         .writer = writer,
-        .root_path = root_path,
     };
-    try exporter.exportRoot(metadata);
+    try exporter.exportRoot(root_path, metadata);
 }
 
 const Export = struct {
@@ -97,11 +96,10 @@ const Export = struct {
 
     arena: std.mem.Allocator,
     writer: std.io.AnyWriter,
-    root_path: []const u8,
     nesting_level: usize = 0,
     state: State = .begin_data,
 
-    pub fn exportRoot(self: *Export, metadata: ?Bookmarklets) !void {
+    pub fn exportRoot(self: *Export, root_path: []const u8, metadata: ?Bookmarklets) !void {
         try self.emitDoctype();
         try self.emitGeneratedFileWarning();
         try self.openTagAndAttributes("META");
@@ -109,7 +107,7 @@ const Export = struct {
         try self.attribute("CONTENT", "text/html; charset=UTF-8");
         try self.finishVoid();
         try self.openTag("DL");
-        try self.exportDir(fs.cwd(), self.root_path, .{
+        try self.exportDir(fs.cwd(), root_path, .{
             .title = "Bookmarklets",
             .items = if (metadata) |m| m.items else .{},
         });
