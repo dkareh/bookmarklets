@@ -100,8 +100,8 @@ const Export = struct {
     state: State = .begin_data,
 
     pub fn exportRoot(self: *Export, root_path: []const u8, metadata: ?Bookmarklets) !void {
-        try self.emitDoctype();
-        try self.emitGeneratedFileWarning();
+        try self.writer.writeAll("<!DOCTYPE NETSCAPE-Bookmark-file-1>");
+        try self.writer.writeAll("\n<!-- This is a generated file! -->");
         try self.openTagAndAttributes("META");
         try self.attribute("HTTP-EQUIV", "Content-Type");
         try self.attribute("CONTENT", "text/html; charset=UTF-8");
@@ -211,14 +211,6 @@ const Export = struct {
         try self.writer.writeByte('>');
         self.nesting_level -= 1;
         self.state = .in_internal_element;
-    }
-
-    fn emitDoctype(self: *Export) !void {
-        try self.writer.writeAll("<!DOCTYPE NETSCAPE-Bookmark-file-1>");
-    }
-
-    fn emitGeneratedFileWarning(self: *Export) !void {
-        try self.writer.writeAll("\n<!-- This is a generated file! -->");
     }
 
     fn data(self: *Export, bytes: []const u8) !void {
