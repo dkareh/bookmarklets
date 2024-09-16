@@ -1,5 +1,5 @@
 // Based on a comment by @johnao under https://www.shadertoy.com/view/lsGGDd
-(async () => {
+(() => {
     if (location.hostname != "www.shadertoy.com") return;
     const DARK = gThemeName == "dark";
 
