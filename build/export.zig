@@ -193,10 +193,11 @@ const Export = struct {
     }
 
     /// Assumes that `name` is a legal HTML attribute name.
+    // https://html.spec.whatwg.org/multipage/parsing.html#attribute-value-(double-quoted)-state
     fn attribute(self: Export, name: []const u8, value: []const u8) !void {
         assert(self.state == .in_attributes);
         try self.writer.print(" {s}=\"", .{name});
-        try self.escapeAttributeValue(value);
+        try self.escape(value, "\"&");
         try self.writer.writeByte('"');
     }
 
@@ -213,29 +214,18 @@ const Export = struct {
         self.state = .in_internal_element;
     }
 
+    // https://html.spec.whatwg.org/multipage/parsing.html#data-state
     fn data(self: *Export, bytes: []const u8) !void {
         assert(self.stateIsOneOf(&.{ .begin_data, .in_leaf_element }));
-        try self.escapeData(bytes);
+        try self.escape(bytes, "&<");
         self.state = .in_leaf_element;
     }
 
-    // https://html.spec.whatwg.org/multipage/parsing.html#data-state
-    fn escapeData(self: Export, bytes: []const u8) !void {
+    fn escape(self: Export, bytes: []const u8, must_escape: []const u8) !void {
         var remaining = bytes;
-        while (std.mem.indexOfAny(u8, remaining, "&<")) |index| {
+        while (std.mem.indexOfAny(u8, remaining, must_escape)) |index| {
             try self.writer.writeAll(remaining[0..index]);
-            try self.writer.writeAll(htmlEscape(remaining[index]));
-            remaining = remaining[index + 1 ..];
-        }
-        try self.writer.writeAll(remaining);
-    }
-
-    // https://html.spec.whatwg.org/multipage/parsing.html#attribute-value-(double-quoted)-state
-    fn escapeAttributeValue(self: Export, value: []const u8) !void {
-        var remaining = value;
-        while (std.mem.indexOfAny(u8, remaining, "\"&")) |index| {
-            try self.writer.writeAll(remaining[0..index]);
-            try self.writer.writeAll(htmlEscape(remaining[index]));
+            try self.writer.writeAll(escapeByte(remaining[index]));
             remaining = remaining[index + 1 ..];
         }
         try self.writer.writeAll(remaining);
@@ -243,7 +233,7 @@ const Export = struct {
 
     // Only return character references that Chromium can correctly unescape.
     // https://chromium.googlesource.com/chromium/src.git/+/a63238f367/base/strings/escape.cc#627
-    fn htmlEscape(byte: u8) []const u8 {
+    fn escapeByte(byte: u8) []const u8 {
         return switch (byte) {
             '&' => "&amp;",
             '<' => "&lt;",
