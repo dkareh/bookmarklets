@@ -107,7 +107,7 @@ const Export = struct {
         try self.openTagAndAttributes("META");
         try self.attribute("HTTP-EQUIV", "Content-Type");
         try self.attribute("CONTENT", "text/html; charset=UTF-8");
-        try self.finishSelfClosing();
+        try self.finishVoid();
         try self.openTag("DL");
         try self.exportDir(fs.cwd(), self.root_path, .{
             .title = "Bookmarklets",
@@ -208,9 +208,9 @@ const Export = struct {
         self.state = .begin_data;
     }
 
-    fn finishSelfClosing(self: *Export) !void {
+    fn finishVoid(self: *Export) !void {
         assert(self.state == .in_attributes);
-        try self.writer.writeAll(" />");
+        try self.writer.writeByte('>');
         self.nesting_level -= 1;
         self.state = .in_internal_element;
     }
