@@ -174,12 +174,6 @@ const Export = struct {
     }
 
     /// Assumes that `name` is a legal HTML tag name.
-    fn openSelfClosingTag(self: *Export, name: []const u8) !void {
-        try self.openTagAndAttributes(name);
-        try self.finishSelfClosing();
-    }
-
-    /// Assumes that `name` is a legal HTML tag name.
     fn openTagAndAttributes(self: *Export, name: []const u8) !void {
         assert(self.stateIsOneOf(&.{ .begin_data, .in_internal_element }));
         try self.nextLine();
