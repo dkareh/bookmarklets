@@ -1,7 +1,17 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const Build = std.Build;
 
+const required_zig_version = std.SemanticVersion.parse("0.13.0") catch unreachable;
+
 pub fn build(b: *Build) !void {
+    if (comptime builtin.zig_version.order(required_zig_version) != .eq) {
+        @compileError(std.fmt.comptimePrint(
+            "Zig version {} is required",
+            .{required_zig_version},
+        ));
+    }
+
     const ziggy_dep = b.dependency("ziggy", .{
         .target = b.graph.host,
     });
