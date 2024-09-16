@@ -80,7 +80,6 @@ fn exportTree(
 }
 
 const Export = struct {
-    const indent_size = 2;
     const State = enum {
         begin_data,
         in_attributes,
@@ -90,6 +89,7 @@ const Export = struct {
 
     arena: std.mem.Allocator,
     writer: std.io.AnyWriter,
+    indent_size: usize = 2,
     nesting_level: usize = 0,
     state: State = .begin_data,
 
@@ -155,8 +155,9 @@ const Export = struct {
     }
 
     fn nextLine(self: Export) !void {
+        const current_indent = self.nesting_level * self.indent_size;
         try self.writer.writeByte('\n');
-        try self.writer.writeByteNTimes(' ', self.nesting_level * indent_size);
+        try self.writer.writeByteNTimes(' ', current_indent);
     }
 
     /// Assumes that `name` is a legal HTML tag name.
