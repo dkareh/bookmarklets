@@ -4,7 +4,6 @@ const Build = std.Build;
 pub fn build(b: *Build) !void {
     const ziggy_dep = b.dependency("ziggy", .{
         .target = b.graph.host,
-        .optimize = .ReleaseSafe,
     });
     const ziggy_exe = ziggy_dep.artifact("ziggy");
     const ziggy_mod = ziggy_dep.module("ziggy");
@@ -35,14 +34,12 @@ pub fn build(b: *Build) !void {
         .name = "generate",
         .root_source_file = b.path("build/generate.zig"),
         .target = b.graph.host,
-        .optimize = .ReleaseSafe,
     });
 
     const export_exe = b.addExecutable(.{
         .name = "export",
         .root_source_file = b.path("build/export.zig"),
         .target = b.graph.host,
-        .optimize = .ReleaseSafe,
     });
     export_exe.root_module.addImport("ziggy", ziggy_mod);
 
@@ -67,8 +64,7 @@ pub fn build(b: *Build) !void {
             continue;
 
         const generate_run = b.addRunArtifact(generate_exe);
-        const source_path = b.path("src").path(b, entry.path);
-        generate_run.addFileArg(source_path);
+        generate_run.addFileArg(b.path("src").path(b, entry.path));
 
         const output_path = generate_run.captureStdOut();
         _ = bookmarklets.addCopyFile(output_path, entry.path);
