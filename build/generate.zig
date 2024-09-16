@@ -20,8 +20,7 @@ pub fn main() !void {
         return error.UnexpectedErrorMessage;
     }
 
-    const direct_writer = std.io.getStdOut().writer();
-    var buffered_writer = std.io.bufferedWriter(direct_writer);
+    var buffered_writer = std.io.bufferedWriter(std.io.getStdOut().writer());
     const writer = buffered_writer.writer();
     var remaining = result.stdout;
     try writer.writeAll("javascript:");

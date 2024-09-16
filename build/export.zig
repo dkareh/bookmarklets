@@ -17,23 +17,17 @@ pub fn main() !void {
 
     // Read the bookmarklets metadata.
     const metadata = if (args.len > 2) blk: {
-        const metadata_path = args[2];
+        const file = try fs.cwd().openFile(args[2], .{});
+        defer file.close();
+        var buffer = std.ArrayList(u8).init(arena);
         const max_bytes = std.math.maxInt(usize);
-        const code = try fs.cwd().readFileAllocOptions(
-            arena,
-            metadata_path,
-            max_bytes,
-            null,
-            1,
-            0,
-        );
+        try file.reader().readAllArrayList(&buffer, max_bytes);
+        const code = try buffer.toOwnedSliceSentinel(0);
         break :blk try ziggy.parseLeaky(Bookmarklets, arena, code, .{});
     } else null;
 
-    const direct_writer = std.io.getStdOut().writer();
-    var buffered_writer = std.io.bufferedWriter(direct_writer);
-    const writer = buffered_writer.writer();
-    try exportTree(arena, writer.any(), root_path, metadata);
+    var buffered_writer = std.io.bufferedWriter(std.io.getStdOut().writer());
+    try exportTree(arena, buffered_writer.writer().any(), root_path, metadata);
     try buffered_writer.flush();
 }
 
