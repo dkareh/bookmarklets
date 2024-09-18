@@ -4,6 +4,12 @@
 
 .items = {
     "clear_timers.js": Bookmarklet { .title = "Clear Timers" },
+    "convert": Folder {
+        .title = "Convert",
+        .items = {
+            "bytes_to_text.js": Bookmarklet { .title = "Bytes → Text" },
+        },
+    },
     "deepl": Folder {
         .title = "DeepL",
         .items = {
