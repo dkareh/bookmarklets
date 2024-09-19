@@ -1,26 +1,33 @@
 (() => {
-    // Only keep characters corresponding to bits: '0' and '1'.
-    const bits = prompt("Enter bytes in binary:").replaceAll(/[^01]/g, "");
-    if (!bits) return;
+    const rawInput = prompt("Enter bytes in binary or hexadecimal:");
+    if (!rawInput) return;
+
+    // Only keep characters corresponding to binary or hexadecimal digits.
+    const digits = rawInput.replaceAll(/[^0-9A-F]/gi, "");
+
+    // If all digits are '0' or '1', then assume the digits are binary.
+    const radix = digits.search(/[^01]/) == -1 ? 2 : 16;
 
     // Determine byte count ahead of time, rounding down if necessary.
-    const byteCount = Math.floor(bits.length / 8);
+    const digitsPerByte = Math.log2(256) / Math.log2(radix);
+    const byteCount = Math.floor(digits.length / digitsPerByte);
 
-    // Convert '0' and '1' characters into an array of integers, assuming the
-    // most significant bit comes before the least significant bit.
+    // Convert the digits into an array of integers, assuming the most
+    // significant digit comes before the least significant digit.
     const bytes = new Uint8Array(byteCount);
     for (let i = 0; i < byteCount; i++) {
-        const offset = i * 8;
-        const currentBits = bits.slice(offset, offset + 8);
-        console.assert(currentBits.length == 8);
-        bytes[i] = parseInt(currentBits, 2);
+        const offset = i * digitsPerByte;
+        const currentDigits = digits.slice(offset, offset + digitsPerByte);
+        console.assert(currentDigits.length == digitsPerByte);
+        bytes[i] = parseInt(currentDigits, radix);
     }
 
     // Decode the bytes, assuming UTF-8 encoding.
     const text = new TextDecoder("UTF-8").decode(bytes);
-    if (bits.length % 8 == 0) {
+    if (digits.length % digitsPerByte == 0) {
         alert(text);
     } else {
-        alert("Warning: Bit count is not a multiple of 8!\n" + text);
+        const warning = `Digit count is not a multiple of ${digitsPerByte}!\n`;
+        alert("Warning: " + warning + text);
     }
 })();
