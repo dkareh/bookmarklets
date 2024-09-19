@@ -8,6 +8,7 @@
         .title = "Convert",
         .items = {
             "bytes_to_text.js": Bookmarklet { .title = "Bytes → Text" },
+            "rot13.js": Bookmarklet { .title = "ROT13" },
         },
     },
     "deepl": Folder {
