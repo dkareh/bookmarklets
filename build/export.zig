@@ -125,9 +125,20 @@ const Export = struct {
     }
 
     fn exportDirEntries(self: *Export, dir: fs.Dir, items: Map(Item)) !void {
+        // Save the entries into a temporary array list.
+        var entries = std.ArrayList(Entry).init(self.arena);
         var iterator = dir.iterate();
-        const fields = items.fields;
         while (try iterator.next()) |entry| {
+            const name = try self.arena.dupe(u8, entry.name);
+            try entries.append(.{ .name = name, .kind = entry.kind });
+        }
+
+        // Entry names are unique, so an unstable sort is acceptable.
+        std.mem.sortUnstable(Entry, entries.items, {}, Entry.lessThan);
+
+        // Now we can export the entries in a consistent order.
+        const fields = items.fields;
+        for (entries.items) |entry| {
             const name = entry.name;
             const metadata = fields.get(name);
             switch (entry.kind) {
@@ -137,6 +148,18 @@ const Export = struct {
             }
         }
     }
+
+    // In case `fs.Dir.Entry` changes, we have our own `Entry` structure that
+    // only stores the information that we need: name and kind.
+    const Entry = struct {
+        name: []const u8,
+        kind: fs.Dir.Entry.Kind,
+
+        pub fn lessThan(_: void, lhs: Entry, rhs: Entry) bool {
+            assert(!std.mem.eql(u8, lhs.name, rhs.name));
+            return std.mem.lessThan(u8, lhs.name, rhs.name);
+        }
+    };
 
     fn exportFile(self: *Export, dir: fs.Dir, path: []const u8, metadata: ?Bookmarklet) !void {
         const max_bytes = std.math.maxInt(usize);
