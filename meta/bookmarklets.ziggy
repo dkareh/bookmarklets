@@ -7,8 +7,8 @@
     "convert": Folder {
         .title = "Convert",
         .items = {
+            "apply_rot13.js": Bookmarklet { .title = "Apply ROT13" },
             "bytes_to_text.js": Bookmarklet { .title = "Bytes → Text" },
-            "rot13.js": Bookmarklet { .title = "ROT13" },
         },
     },
     "deepl": Folder {
