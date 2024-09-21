@@ -52,6 +52,8 @@
     "shadertoy": Folder {
         .title = "Shadertoy",
         .items = {
+            "export_shader.js": Bookmarklet { .title = "Export Shader" },
+            "import_shader.js": Bookmarklet { .title = "Import Shader" },
             "load_textures.js": Bookmarklet { .title = "Load Textures" },
         },
     },
