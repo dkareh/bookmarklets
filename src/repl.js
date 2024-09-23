@@ -18,6 +18,17 @@
         // The type of `null` is "object", so handle it here.
         if (object === null) return "null";
 
+        // Handle primitives wrapped in objects.
+        if (object instanceof Boolean) {
+            return `Boolean { ${object.toString()} }`;
+        }
+        if (object instanceof Number) {
+            return `Number { ${object.toString()} }`;
+        }
+        if (object instanceof String) {
+            return `String { ${quote(object)} }`;
+        }
+
         // Handle special objects.
         if (Array.isArray(object)) return inspectArray(object);
 
