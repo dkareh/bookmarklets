@@ -24,11 +24,19 @@ pub fn main() !void {
     const writer = buffered_writer.writer();
     var remaining = result.stdout;
     try writer.writeAll("javascript:");
-    while (std.mem.indexOfAny(u8, remaining, "%\n")) |index| {
+    while (indexOfUnsafeByte(remaining)) |index| {
         try writer.writeAll(remaining[0..index]);
         try writer.print("%{X:0>2}", .{remaining[index]});
         remaining = remaining[index + 1 ..];
     }
     try writer.writeAll(remaining);
     try buffered_writer.flush();
+}
+
+fn indexOfUnsafeByte(bytes: []const u8) ?usize {
+    for (bytes, 0..) |byte, i| {
+        if (std.ascii.isControl(byte) or byte == '%')
+            return i;
+    }
+    return null;
 }

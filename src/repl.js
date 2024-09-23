@@ -71,9 +71,23 @@
     const escapeSequences = new Map([
         ['"', '\\"'],
         ["\\", "\\\\"],
+        ["\b", "\\b"],
+        ["\t", "\\t"],
         ["\n", "\\n"],
+        ["\v", "\\v"],
+        ["\f", "\\f"],
         ["\r", "\\r"],
+        ["\x7F", "\\x7F"],
     ]);
+
+    // Add escape sequences for the remaining ASCII control characters.
+    for (let code = 0; code < 32; ++code) {
+        const char = String.fromCodePoint(code);
+        if (!escapeSequences.has(char)) {
+            const hex = code.toString(16).padStart(2, "0").toUpperCase();
+            escapeSequences.set(char, "\\u{" + hex + "}");
+        }
+    }
 
     function quote(string) {
         return `"${escape(string)}"`;
