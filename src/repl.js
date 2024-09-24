@@ -45,7 +45,8 @@
 
         // Handle regular objects.
         const props = Object.entries(object).map(inspectProp).join(", ");
-        return props == "" ? `{ }` : `{ ${props} }`;
+        const tag = object[Symbol.toStringTag]?.concat(" ") ?? "";
+        return tag + (props == "" ? `{ }` : `{ ${props} }`);
     }
 
     function inspectProp([key, value]) {
