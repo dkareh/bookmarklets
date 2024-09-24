@@ -31,6 +31,8 @@
 
         // Handle special objects.
         if (Array.isArray(object)) return inspectArray(object);
+        if (object instanceof Map) return inspectMap(object);
+        if (object instanceof Set) return inspectSet(object);
         if (object instanceof Date) {
             if (Number.isNaN(object.getTime())) return 'Date { "Invalid Date" }';
             return `Date { ${quote(object.toISOString())} }`;
@@ -46,6 +48,7 @@
         // Handle regular objects.
         const props = Object.entries(object).map(inspectProp).join(", ");
         const tag = object[Symbol.toStringTag]?.concat(" ") ?? "";
+        // Don't output two spaces in an empty object.
         return tag + (props == "" ? `{ }` : `{ ${props} }`);
     }
 
@@ -78,6 +81,20 @@
             slots.push(`<${emptySlotCount} empty slot${suffix}>`);
         }
         return `[ ${slots.join(", ")} ]`;
+    }
+
+    function inspectMap(map) {
+        // Don't output two spaces in an empty map.
+        if (map.size == 0) return "Map { }";
+        const entries = [...map].map(inspectProp);
+        return `Map { ${entries.join(", ")} }`;
+    }
+
+    function inspectSet(set) {
+        // Don't output two spaces in an empty set.
+        if (set.size == 0) return "Set { }";
+        const values = [...set].map(inspect);
+        return `Set { ${values.join(", ")} }`;
     }
 
     const escapeSequences = new Map([
