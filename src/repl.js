@@ -50,7 +50,7 @@
     }
 
     function inspectProp([key, value]) {
-        return `${quoteKeyIfNeeded(key)}: ${inspect(value)}`;
+        return `${inspectKey(key)}: ${inspect(value)}`;
     }
 
     function inspectArray(array) {
@@ -111,9 +111,12 @@
             .join("");
     }
 
-    function quoteKeyIfNeeded(key) {
-        const identifier = /^[\p{ID_Start}$_][\p{ID_Continue}$]*$/u;
-        return identifier.test(key) ? key : quote(key);
+    function inspectKey(key) {
+        if (typeof key == "string") {
+            const identifier = /^[\p{ID_Start}$_][\p{ID_Continue}$]*$/u;
+            return identifier.test(key) ? key : quote(key);
+        }
+        return `[${inspect(key)}]`;
     }
 
     for (let code = `[..."Hello! \\u{1F600}"].join("·")`; ; ) {
