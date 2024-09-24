@@ -31,6 +31,17 @@
 
         // Handle special objects.
         if (Array.isArray(object)) return inspectArray(object);
+        if (object instanceof Date) {
+            if (Number.isNaN(object.getTime())) return 'Date { "Invalid Date" }';
+            return `Date { ${quote(object.toISOString())} }`;
+        }
+        if (object instanceof Error) {
+            const name = object.name ?? "Error";
+            return `${name} { message: ${quote(object.message)} }`;
+        }
+        if (object instanceof RegExp) {
+            return object.toString();
+        }
 
         // Handle regular objects.
         const props = Object.entries(object).map(inspectProp).join(", ");
