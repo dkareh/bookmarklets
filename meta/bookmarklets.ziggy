@@ -60,4 +60,5 @@
             "load_textures.js": Bookmarklet { .title = "Load Textures" },
         },
     },
+    "wayback_machine.js": Bookmarklet { .title = "Wayback Machine" },
 },
