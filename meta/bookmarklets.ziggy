@@ -38,7 +38,7 @@
     "qobuz": Folder {
         .title = "Qobuz",
         .items = {
-            "download_all_tracks.js": Bookmarklet { .title = "Download All Tracks" },
+            "download_album.js": Bookmarklet { .title = "Download Album" },
         },
     },
     "reddit.js": Bookmarklet { .title = "Reddit" },

@@ -25,4 +25,14 @@
     for (const [index, track] of tracks.entries()) {
         setTimeout(() => track.click(), index * delay);
     }
+
+    // Download the album cover.
+    const cover = document.querySelector("#all-tracks tr:has(.icon-picture) a");
+    setTimeout(() => cover.click(), tracks.length * delay);
+
+    // Qobuz sets the 'target' attribute to '_blank' to force the cover to open
+    // in a new tab, and since we programmatically open the link, the browser
+    // believes we're opening a pop-up. Therefore, to avoid pop-up warnings, we
+    // must remove the 'target' attribute.
+    cover.removeAttribute("target");
 })();
