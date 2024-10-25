@@ -145,7 +145,14 @@
         let result;
         try {
             // Use `?.` (optional chaining) to force indirect `eval`.
-            result = "✔ " + inspect(eval?.(`"use strict"; ${code}`));
+            result = eval?.(`"use strict"; ${code}`);
+            try {
+                result = "✔ " + inspect(result);
+            } catch (error) {
+                // Show the user the internal REPL error instead of quitting.
+                // Use Unicode VS15 (U+FE0E) to request text presentation.
+                result = "\u2757\uFE0E " + error;
+            }
         } catch (error) {
             result = "✘ " + error;
         }
