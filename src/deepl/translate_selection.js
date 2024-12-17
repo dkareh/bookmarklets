@@ -1,8 +1,10 @@
 (() => {
-    const text = getSelection().toString();
-    // NOTE: The hash doesn't have to be "#auto/...", but that choice is
-    // the most self-explanatory: we want DeepL to infer the languages.
-    const prefix = "https://www.deepl.com/translator#auto/";
+    // For unknown reasons, some characters break DeepL.
+    const badCharacterRegex = /[%./]/g;
+    const text = getSelection().toString().replaceAll(badCharacterRegex, "");
+    // To make DeepL detect the language, we use '_' instead of a real language
+    // tag. (I originally used 'detect', but DeepL interpreted it as German.)
+    const prefix = "https://www.deepl.com/translator/q/_/";
     const tag = navigator.languages?.[0] ?? navigator.language;
-    location.assign(prefix + tag + "/" + encodeURIComponent(text));
+    location.assign(prefix + encodeURIComponent(text) + "/" + tag);
 })();
