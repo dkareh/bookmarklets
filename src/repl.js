@@ -44,6 +44,32 @@
         if (object instanceof RegExp) {
             return object.toString();
         }
+        if (Object.prototype.toString.call(object) == "[object Arguments]") {
+            // `object` is *likely* an arguments array-like object.
+            return `Arguments ${inspectArray(object)}`;
+        }
+        if (object instanceof WeakRef) {
+            return `WeakRef { ${inspect(object.deref())} }`;
+        }
+        if (object instanceof ArrayBuffer) {
+            const array = new Uint8Array(object);
+            return `ArrayBuffer ${inspectTypedArray(array)}`;
+        }
+        // NOTE: Browsers may omit `SharedArrayBuffer` from the `window` object.
+        if (window.SharedArrayBuffer) {
+            if (object instanceof window.SharedArrayBuffer) {
+                const array = new Uint8Array(object);
+                return `SharedArrayBuffer ${inspectTypedArray(array)}`;
+            }
+        }
+        if (ArrayBuffer.isView(object)) {
+            if (object instanceof DataView) {
+                return inspectDataView(object);
+            } else {
+                const name = object.constructor.name;
+                return name + " " + inspectTypedArray(object);
+            }
+        }
 
         // Handle regular objects.
         const props = Object.entries(object).map(inspectProp).join(", ");
@@ -81,6 +107,32 @@
             slots.push(`<${emptySlotCount} empty slot${suffix}>`);
         }
         return `[ ${slots.join(", ")} ]`;
+    }
+
+    function inspectDataView({ buffer, byteOffset, byteLength }) {
+        const array = new Uint8Array(buffer, byteOffset, byteLength);
+        return `DataView ${inspectTypedArray(array)}`;
+    }
+
+    function inspectTypedArray(array) {
+        // Don't output two spaces in an empty typed array.
+        if (array.length == 0) return "[ ]";
+        const elements = [...array].map((element) => {
+            // NOTE: `Float16Array` is not univerally supported.
+            if (window.Float16Array && array instanceof window.Float16Array)
+                return element.toString();
+            if (array instanceof Float32Array) return element.toString();
+            if (array instanceof Float64Array) return element.toString();
+
+            // We're not displaying the two's complement representation of
+            // negative integers, so we need to move the minus sign before "0x".
+            const sign = element < 0 ? "-" : "";
+            if (element < 0) element = -element;
+            const maxDigitCount = array.BYTES_PER_ELEMENT * 2;
+            const hex = element.toString(16).padStart(maxDigitCount, "0").toUpperCase();
+            return sign + "0x" + hex;
+        });
+        return `[ ${elements.join(", ")} ]`;
     }
 
     function inspectMap(map) {
