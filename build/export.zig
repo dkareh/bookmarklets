@@ -134,7 +134,7 @@ const Export = struct {
         }
 
         // Entry names are unique, so an unstable sort is acceptable.
-        std.mem.sortUnstable(Entry, entries.items, {}, Entry.lessThan);
+        std.mem.sortUnstable(Entry, entries.items, items, Entry.lessThan);
 
         // Now we can export the entries in a consistent order.
         const fields = items.fields;
@@ -155,9 +155,17 @@ const Export = struct {
         name: []const u8,
         kind: fs.Dir.Entry.Kind,
 
-        pub fn lessThan(_: void, lhs: Entry, rhs: Entry) bool {
-            assert(!std.mem.eql(u8, lhs.name, rhs.name));
-            return std.mem.lessThan(u8, lhs.name, rhs.name);
+        pub fn lessThan(items: Map(Item), lhs: Entry, rhs: Entry) bool {
+            const lhs_item = items.fields.get(lhs.name);
+            const rhs_item = items.fields.get(rhs.name);
+            const lhs_name = if (lhs_item) |item| switch (item) {
+                inline else => |metadata| metadata.title,
+            } else lhs.name;
+            const rhs_name = if (rhs_item) |item| switch (item) {
+                inline else => |metadata| metadata.title,
+            } else rhs.name;
+            assert(!std.mem.eql(u8, lhs_name, rhs_name));
+            return std.ascii.lessThanIgnoreCase(lhs_name, rhs_name);
         }
     };
 
