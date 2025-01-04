@@ -44,6 +44,13 @@
         if (object instanceof RegExp) {
             return object.toString();
         }
+        if (Object.prototype.toString.call(object) == "[object Arguments]") {
+            // `object` is *probably* an arguments array-like object.
+            return `Arguments ${inspectArray(object)}`;
+        }
+        if (object instanceof WeakRef) {
+            return `WeakRef { ${inspect(object.deref())} }`;
+        }
 
         // Handle regular objects.
         const props = Object.entries(object).map(inspectProp).join(", ");
