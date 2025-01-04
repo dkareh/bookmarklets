@@ -1,5 +1,6 @@
 (() => {
     const text = getSelection().toString();
+    if (!text) return;
     const prefix = "https://translate.google.com/?op=translate&sl=auto&tl=";
     // Google Translate usually only needs the primary language subtag.
     // https://datatracker.ietf.org/doc/html/rfc5646#section-2.1

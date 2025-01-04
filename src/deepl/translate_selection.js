@@ -9,6 +9,7 @@
     // or', so replace each character by a single space instead.
     const forbiddenCharacterRegex = /[\n\r\u2028\u2029%./]/g;
     const text = getSelection().toString().replaceAll(forbiddenCharacterRegex, " ");
+    if (!text) return;
     // To make DeepL detect the language, we use '_' instead of a real language
     // tag. (I originally used 'detect', but DeepL thought I meant German.)
     const prefix = "https://www.deepl.com/translator/q/_/";
