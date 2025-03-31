@@ -1,11 +1,12 @@
 .{
-    .name = "bookmarklets",
+    .name = .bookmarklets,
     .version = "0.0.0",
-    .minimum_zig_version = "0.13.0",
+    .fingerprint = 0xf1ded32b56220357,
+    .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .ziggy = .{
-            .url = "https://github.com/kristoff-it/ziggy/archive/c66f47bc632c66668d61fa06eda112b41d6e5130.tar.gz",
-            .hash = "1220115ff095a3c970cc90fce115294ba67d6fbc4927472dc856abc51e2a1a9364d7",
+            .url = "https://github.com/kristoff-it/ziggy/archive/8a29017169f43dc2c3526817e98142eb9a335087.tar.gz",
+            .hash = "ziggy-0.1.0-kTg8vwkbBgAOHreabwZtDDtNDi3U_RAiOMvuRDTJiy0I",
         },
     },
     .paths = .{

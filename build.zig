@@ -2,7 +2,7 @@ const std = @import("std");
 const builtin = @import("builtin");
 const Build = std.Build;
 
-const required_zig_version = std.SemanticVersion.parse("0.13.0") catch unreachable;
+const required_zig_version = std.SemanticVersion.parse("0.14.0") catch unreachable;
 
 pub fn build(b: *Build) !void {
     if (comptime builtin.zig_version.order(required_zig_version) != .eq) {
@@ -14,6 +14,7 @@ pub fn build(b: *Build) !void {
 
     const ziggy_dep = b.dependency("ziggy", .{
         .target = b.graph.host,
+        .optimize = .Debug,
     });
     const ziggy_exe = ziggy_dep.artifact("ziggy");
     const ziggy_mod = ziggy_dep.module("ziggy");
@@ -42,16 +43,22 @@ pub fn build(b: *Build) !void {
 
     const generate_exe = b.addExecutable(.{
         .name = "generate",
-        .root_source_file = b.path("build/generate.zig"),
-        .target = b.graph.host,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("build/generate.zig"),
+            .target = b.graph.host,
+        }),
     });
 
     const export_exe = b.addExecutable(.{
         .name = "export",
-        .root_source_file = b.path("build/export.zig"),
-        .target = b.graph.host,
+        .root_module = b.createModule(.{
+            .root_source_file = b.path("build/export.zig"),
+            .target = b.graph.host,
+            .imports = &.{
+                .{ .name = "ziggy", .module = ziggy_mod },
+            },
+        }),
     });
-    export_exe.root_module.addImport("ziggy", ziggy_mod);
 
     // NOTE: Using `addWriteFiles` will bloat the cache directory, but
     // eventually I want to do additional processing on the bookmarklets, so
