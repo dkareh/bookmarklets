@@ -126,11 +126,11 @@ const Export = struct {
 
     fn exportDirEntries(self: *Export, dir: fs.Dir, items: Map(Item)) !void {
         // Save the entries into a temporary array list.
-        var entries = std.ArrayList(Entry).init(self.arena);
-        var iterator = dir.iterate();
+        var entries: std.ArrayListUnmanaged(Entry) = .empty;
+        var iterator = dir.iterateAssumeFirstIteration();
         while (try iterator.next()) |entry| {
             const name = try self.arena.dupe(u8, entry.name);
-            try entries.append(.{ .name = name, .kind = entry.kind });
+            try entries.append(self.arena, .{ .name = name, .kind = entry.kind });
         }
 
         // Entry names are unique, so an unstable sort is acceptable.
