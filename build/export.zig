@@ -17,12 +17,9 @@ pub fn main() !void {
 
     // Read the bookmarklets metadata.
     const metadata = if (args.len > 2) blk: {
-        const file = try fs.cwd().openFile(args[2], .{});
-        defer file.close();
-        var buffer = std.ArrayList(u8).init(arena);
+        const metadata_path = args[2];
         const max_bytes = std.math.maxInt(usize);
-        try file.reader().readAllArrayList(&buffer, max_bytes);
-        const code = try buffer.toOwnedSliceSentinel(0);
+        const code = try fs.cwd().readFileAllocOptions(arena, metadata_path, max_bytes, null, 1, 0);
         break :blk try ziggy.parseLeaky(Bookmarklets, arena, code, .{});
     } else null;
 
