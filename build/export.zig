@@ -165,13 +165,14 @@ const Export = struct {
             const rhs_title = if (rhs_item) |item| switch (item) {
                 inline else => |metadata| metadata.title,
             } else rhs.name;
-            if (std.mem.eql(u8, lhs_title, rhs_title)) {
+            const order = std.ascii.orderIgnoreCase(lhs_title, rhs_title);
+            if (order == .eq) {
                 std.debug.panic(
-                    "Entries '{s}' and '{s}' have the same title: '{s}'",
+                    "Entries '{s}' and '{s}' have the same (case-insensitive) title: '{s}'",
                     .{ lhs.name, rhs.name, lhs_title },
                 );
             }
-            return std.ascii.lessThanIgnoreCase(lhs_title, rhs_title);
+            return order == .lt;
         }
     };
 
