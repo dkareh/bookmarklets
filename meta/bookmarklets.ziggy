@@ -23,6 +23,8 @@
             "text_to_bytes.js": Bookmarklet { .title = "Text 🡒 Bytes" },
         },
     },
+    "copy_link_html.js": Bookmarklet { .title = "Copy Link (HTML)" },
+    "copy_link_markdown.js": Bookmarklet { .title = "Copy Link (Markdown)" },
     "deepl": Folder {
         .title = "DeepL",
         .items = {
