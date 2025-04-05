@@ -17,10 +17,10 @@
         .items = {
             "apply_rot13.js": Bookmarklet { .title = "Apply ROT13" },
             "apply_rot13_to_selection.js": Bookmarklet { .title = "Apply ROT13 to Selection" },
-            "base64_to_bytes.js": Bookmarklet { .title = "Base64 → Bytes" },
-            "bytes_to_base64.js": Bookmarklet { .title = "Bytes → Base64" },
-            "bytes_to_text.js": Bookmarklet { .title = "Bytes → Text" },
-            "text_to_bytes.js": Bookmarklet { .title = "Text → Bytes" },
+            "base64_to_bytes.js": Bookmarklet { .title = "Base64 🡒 Bytes" },
+            "bytes_to_base64.js": Bookmarklet { .title = "Bytes 🡒 Base64" },
+            "bytes_to_text.js": Bookmarklet { .title = "Bytes 🡒 Text" },
+            "text_to_bytes.js": Bookmarklet { .title = "Text 🡒 Bytes" },
         },
     },
     "deepl": Folder {
