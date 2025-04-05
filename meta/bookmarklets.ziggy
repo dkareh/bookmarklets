@@ -3,6 +3,12 @@
 //! metadata attached to them.
 
 .items = {
+    "archive": Folder {
+        .title = "Archive",
+        .items = {
+            "wayback_machine.js": Bookmarklet { .title = "Wayback Machine" },
+        },
+    },
     "clear_timers.js": Bookmarklet { .title = "Clear Timers" },
     "convert": Folder {
         .title = "Convert",
@@ -61,5 +67,4 @@
             "load_textures.js": Bookmarklet { .title = "Load Textures" },
         },
     },
-    "wayback_machine.js": Bookmarklet { .title = "Wayback Machine" },
 },
