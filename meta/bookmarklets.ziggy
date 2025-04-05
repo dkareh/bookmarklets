@@ -6,6 +6,8 @@
     "archive": Folder {
         .title = "Archive",
         .items = {
+            "archive.today.js": Bookmarklet { .title = "Archive.today" },
+            "ghostarchive.js": Bookmarklet { .title = "Ghostarchive" },
             "wayback_machine.js": Bookmarklet { .title = "Wayback Machine" },
         },
     },
