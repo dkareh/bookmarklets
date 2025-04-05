@@ -12,6 +12,18 @@ pub fn build(b: *Build) !void {
         ));
     }
 
+    if (builtin.os.tag == .windows) {
+        // Windows doesn't let the build runner delete the cache directory
+        // because the build runner is *in* the cache directory.
+        const clean_step = b.step("clean", "Delete the installation directory");
+        clean_step.dependOn(&b.addRemoveDirTree(.{ .cwd_relative = b.install_path }).step);
+    } else {
+        const clean_step = b.step("clean", "Delete the cache and installation directories");
+        const cache_path = b.cache_root.path orelse try std.process.getCwdAlloc(b.allocator);
+        clean_step.dependOn(&b.addRemoveDirTree(.{ .cwd_relative = cache_path }).step);
+        clean_step.dependOn(&b.addRemoveDirTree(.{ .cwd_relative = b.install_path }).step);
+    }
+
     const ziggy_dep = b.dependency("ziggy", .{
         .target = b.graph.host,
         .optimize = .Debug,
