@@ -36,6 +36,7 @@
         .title = "Discord",
         .items = {
             "decode_snowflake.js": Bookmarklet { .title = "Decode Snowflake" },
+            "edit_attachments.js": Bookmarklet { .title = "Edit Attachments" },
         },
     },
     "github": Folder {
