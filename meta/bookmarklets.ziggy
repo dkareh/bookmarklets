@@ -69,4 +69,12 @@
             "load_textures.js": Bookmarklet { .title = "Load Textures" },
         },
     },
+    "web_development": Folder {
+        .title = "Web Development",
+        .items = {
+            "evaluate_accessibility_wave.js": Bookmarklet { .title = "Evaluate Accessibility (WAVE)" },
+            "validate_html_nu.js": Bookmarklet { .title = "Validate HTML (Nu)" },
+            "validate_html_w3c.js": Bookmarklet { .title = "Validate HTML (W3C)" },
+        },
+    },
 },
