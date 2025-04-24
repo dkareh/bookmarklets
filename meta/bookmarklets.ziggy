@@ -36,6 +36,13 @@
             "decode_snowflake.js": Bookmarklet { .title = "Decode Snowflake" },
         },
     },
+    "github": Folder {
+        .title = "GitHub",
+        .items = {
+            "collapse_diffs.js": Bookmarklet { .title = "Collapse Diffs" },
+            "expand_diffs.js": Bookmarklet { .title = "Expand Diffs" },
+        },
+    },
     "google": Folder {
         .title = "Google",
         .items = {
