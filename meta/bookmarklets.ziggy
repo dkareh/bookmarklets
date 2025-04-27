@@ -59,6 +59,7 @@
     },
     "reddit.js": Bookmarklet { .title = "Reddit" },
     "repl.js": Bookmarklet { .title = "REPL" },
+    "restore_paste.js": Bookmarklet { .title = "Restore Paste" },
     "sci_hub": Folder {
         .title = "Sci-Hub",
         .items = {
