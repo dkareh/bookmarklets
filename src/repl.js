@@ -5,7 +5,13 @@
         function: (func) => func.toString(),
         number: (number) => number.toString(),
         object: inspectObject,
-        string: (string) => quote(string),
+        string: (string) => {
+            if ([...string].length == 1) {
+                const hex = string.codePointAt(0).toString(16);
+                return `${quote(string)} (U+${hex.padStart(4, "0").toUpperCase()})`;
+            }
+            return quote(string);
+        },
         symbol: (symbol) => `Symbol(${quote(symbol.description)})`,
         undefined: () => "undefined",
     };
