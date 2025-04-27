@@ -16,6 +16,16 @@
         }
     `;
 
+    function outlineMessageRule({ channel, message }) {
+        return `
+            li[id="chat-messages-${channel}-${message}"] > ${wrapperSelector} {
+                --thickness: 0.1rem;
+                outline: var(--thickness) dotted cyan;
+                outline-offset: calc(-0.5 * var(--thickness));
+            }
+        `;
+    }
+
     const sheet = new CSSStyleSheet();
     sheet.replaceSync(outlineMessagesRule);
     document.adoptedStyleSheets.push(sheet);
@@ -32,7 +42,7 @@
         const ids = getMessageIds(target);
         if (!ids) return;
         document.removeEventListener("click", click, { capture: true });
-        removeStyleSheet(sheet);
+        sheet.replaceSync(outlineMessageRule(ids));
         readFiles(ids);
     }
 
@@ -41,8 +51,12 @@
         input.type = "file";
         input.multiple = multiple;
         input.addEventListener("change", () => {
+            removeStyleSheet(sheet);
             const files = input.files;
             editAttachments(ids, [...files]);
+        });
+        input.addEventListener("cancel", () => {
+            removeStyleSheet(sheet);
         });
         input.click();
     }
