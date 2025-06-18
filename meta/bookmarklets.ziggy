@@ -30,6 +30,13 @@
             "translate_selection.js": Bookmarklet { .title = "Translate Selection" },
         },
     },
+    "desmos": Folder {
+        .title = "Desmos",
+        .items = {
+            "export_graph.js": Bookmarklet { .title = "Export Graph" },
+            "import_graph.js": Bookmarklet { .title = "Import Graph" },
+        },
+    },
     "discord": Folder {
         .title = "Discord",
         .items = {
