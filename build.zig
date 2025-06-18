@@ -2,13 +2,14 @@ const std = @import("std");
 const builtin = @import("builtin");
 const Build = std.Build;
 
-const required_zig_version = std.SemanticVersion.parse("0.14.0") catch unreachable;
+// Must match `minimum_zig_version` in `build.zig.zon`:
+const minimum_zig_version = std.SemanticVersion.parse("0.14.0") catch unreachable;
 
 pub fn build(b: *Build) !void {
-    if (comptime builtin.zig_version.order(required_zig_version) != .eq) {
+    if (comptime builtin.zig_version.order(minimum_zig_version).compare(.lt)) {
         @compileError(std.fmt.comptimePrint(
-            "Zig version {} is required",
-            .{required_zig_version},
+            "Zig version {} or later is required.",
+            .{minimum_zig_version},
         ));
     }
 

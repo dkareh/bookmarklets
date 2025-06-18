@@ -2,6 +2,7 @@
     .name = .bookmarklets,
     .version = "0.0.0",
     .fingerprint = 0xf1ded32b56220357,
+    // Must match `minimum_zig_version` in `build.zig`:
     .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .ziggy = .{
