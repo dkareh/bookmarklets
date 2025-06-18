@@ -5,8 +5,8 @@
     .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .ziggy = .{
-            .url = "https://github.com/kristoff-it/ziggy/archive/8a29017169f43dc2c3526817e98142eb9a335087.tar.gz",
-            .hash = "ziggy-0.1.0-kTg8vwkbBgAOHreabwZtDDtNDi3U_RAiOMvuRDTJiy0I",
+            .url = "https://github.com/kristoff-it/ziggy/archive/fe3bf9389e7ff213cf3548caaf9c6f3d4bb38647.tar.gz",
+            .hash = "ziggy-0.1.0-kTg8vwBEBgDFzbstERaPLr5TzM1DhfDza1we_eEXuLDL",
         },
     },
     .paths = .{
