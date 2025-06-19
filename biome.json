@@ -1,7 +1,7 @@
 {
-    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
     "files": {
-        "include": ["biome.json", "src/**/*.js"]
+        "includes": ["biome.json", "src/**/*.js"]
     },
     "vcs": {
         "enabled": true,
@@ -15,7 +15,6 @@
         "indentWidth": 4,
         "lineWidth": 90
     },
-    "assists": { "enabled": false },
-    "linter": { "enabled": false },
-    "organizeImports": { "enabled": false }
+    "assist": { "enabled": false },
+    "linter": { "enabled": false }
 }
