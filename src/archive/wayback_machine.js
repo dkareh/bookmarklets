@@ -7,4 +7,11 @@
 // NOTE: It probably won't happen, but I'm assuming the Wayback Machine will
 // fall back to returning an archive from 1996 to 1999 if there's no newer one.
 // Source: https://github.com/internetarchive/wayback/blob/a331f968/wayback-core/src/main/java/org/archive/wayback/archivalurl/requestparser/ReplayRequestParser.java#L60-L65
-location.assign(`https://web.archive.org/web/2/${encodeURIComponent(location.href)}`);
+(() => {
+    const url = new URL(location.href);
+    url.username = "";
+    url.password = "";
+    url.search = "";
+    url.hash = "";
+    location.assign(`https://web.archive.org/web/2/${encodeURIComponent(url)}`);
+})();
