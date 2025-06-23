@@ -1,6 +1,6 @@
 // Based on a comment by @johnao under https://www.shadertoy.com/view/lsGGDd
 (() => {
-    if (location.hostname != "www.shadertoy.com") return;
+    if (location.origin != "https://www.shadertoy.com") return;
     const DARK = gThemeName == "dark";
 
     // Place a file input under each input selector.
