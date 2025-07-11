@@ -3,7 +3,7 @@
     if (!rawInput) return;
 
     // Only keep characters corresponding to binary or hexadecimal digits.
-    const digits = rawInput.replaceAll(/[^0-9A-F]/gi, "");
+    const digits = rawInput.replaceAll(/\P{ASCII_Hex_Digit}/gu, "");
 
     // If all digits are '0' or '1', then assume the digits are binary.
     const radix = digits.search(/[^01]/) == -1 ? 2 : 16;
