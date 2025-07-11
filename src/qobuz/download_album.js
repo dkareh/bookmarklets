@@ -55,6 +55,8 @@
 
             let name = row.querySelector("td").textContent.replace(/^\d+ - /, "");
             name = `${disc.padStart(2, "0")}-${track.padStart(2, "0")} ${name}`;
+            // Insert spaces before brackets and parentheses.
+            name = name.replaceAll(/\S(?=[[(])/g, "$& ");
 
             // Send one request at a time.
             const uri = link.dataset.uri.replace("/xx", "/" + preferredFormat);
