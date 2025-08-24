@@ -1,6 +1,7 @@
 const std = @import("std");
 const assert = std.debug.assert;
 const fs = std.fs;
+
 const ziggy = @import("ziggy");
 const Map = ziggy.dynamic.Map;
 
@@ -19,13 +20,15 @@ pub fn main() !void {
     const metadata = if (args.len > 2) blk: {
         const metadata_path = args[2];
         const max_bytes = std.math.maxInt(usize);
-        const code = try fs.cwd().readFileAllocOptions(arena, metadata_path, max_bytes, null, 1, 0);
+        const code = try fs.cwd().readFileAllocOptions(arena, metadata_path, max_bytes, null, .@"1", 0);
         break :blk try ziggy.parseLeaky(Bookmarklets, arena, code, .{});
     } else null;
 
-    var buffered_writer = std.io.bufferedWriter(std.io.getStdOut().writer());
-    try exportTree(arena, buffered_writer.writer().any(), root_path, metadata);
-    try buffered_writer.flush();
+    var stdout_buffer: [4096]u8 = undefined;
+    var stdout_writer = fs.File.stdout().writer(&stdout_buffer);
+    const stdout = &stdout_writer.interface;
+    try exportTree(arena, stdout, root_path, metadata);
+    try stdout.flush();
 }
 
 // Any changes must be reflected in 'meta/bookmarklets.ziggy-schema'.
@@ -65,7 +68,7 @@ const Bookmarklet = struct {
 
 fn exportTree(
     arena: std.mem.Allocator,
-    writer: std.io.AnyWriter,
+    writer: *std.Io.Writer,
     root_path: []const u8,
     metadata: ?Bookmarklets,
 ) !void {
@@ -85,7 +88,7 @@ const Export = struct {
     };
 
     arena: std.mem.Allocator,
-    writer: std.io.AnyWriter,
+    writer: *std.Io.Writer,
     indent_size: usize = 2,
     nesting_level: usize = 0,
     state: State = .begin_data,
@@ -123,7 +126,7 @@ const Export = struct {
 
     fn exportDirEntries(self: *Export, dir: fs.Dir, items: Map(Item)) !void {
         // Save the entries into a temporary array list.
-        var entries: std.ArrayListUnmanaged(Entry) = .empty;
+        var entries: std.ArrayList(Entry) = .empty;
         var iterator = dir.iterateAssumeFirstIteration();
         while (try iterator.next()) |entry| {
             const name = try self.arena.dupe(u8, entry.name);
@@ -190,9 +193,9 @@ const Export = struct {
     }
 
     fn nextLine(self: Export) !void {
+        var buffers = [_][]const u8{ "\n", " " };
         const current_indent = self.nesting_level * self.indent_size;
-        try self.writer.writeByte('\n');
-        try self.writer.writeByteNTimes(' ', current_indent);
+        try self.writer.writeSplatAll(&buffers, current_indent);
     }
 
     /// Assumes that `name` is a legal HTML tag name.

@@ -20,17 +20,18 @@ pub fn main() !void {
         return error.UnexpectedErrorMessage;
     }
 
-    var buffered_writer = std.io.bufferedWriter(std.io.getStdOut().writer());
-    const writer = buffered_writer.writer();
+    var stdout_buffer: [4096]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    const stdout = &stdout_writer.interface;
     var remaining = result.stdout;
-    try writer.writeAll("javascript:");
+    try stdout.writeAll("javascript:");
     while (indexOfUnsafeByte(remaining)) |index| {
-        try writer.writeAll(remaining[0..index]);
-        try writer.print("%{X:0>2}", .{remaining[index]});
+        try stdout.writeAll(remaining[0..index]);
+        try stdout.print("%{X:0>2}", .{remaining[index]});
         remaining = remaining[index + 1 ..];
     }
-    try writer.writeAll(remaining);
-    try buffered_writer.flush();
+    try stdout.writeAll(remaining);
+    try stdout.flush();
 }
 
 fn indexOfUnsafeByte(bytes: []const u8) ?usize {

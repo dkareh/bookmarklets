@@ -3,11 +3,11 @@
     .version = "0.0.0",
     .fingerprint = 0xf1ded32b56220357,
     // Must match `minimum_zig_version` in `build.zig`:
-    .minimum_zig_version = "0.14.0",
+    .minimum_zig_version = "0.15.1",
     .dependencies = .{
         .ziggy = .{
-            .url = "https://github.com/kristoff-it/ziggy/archive/fe3bf9389e7ff213cf3548caaf9c6f3d4bb38647.tar.gz",
-            .hash = "ziggy-0.1.0-kTg8vwBEBgDFzbstERaPLr5TzM1DhfDza1we_eEXuLDL",
+            .url = "https://github.com/kristoff-it/ziggy/archive/4353b20ef2ac750e35c6d68e4eb2a07c2d7cf901.tar.gz",
+            .hash = "ziggy-0.1.0-kTg8v5pABgDztlefWHceH-Sh8tVveguFC61QkmLkIRaA",
         },
     },
     .paths = .{

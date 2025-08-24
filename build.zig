@@ -3,7 +3,7 @@ const builtin = @import("builtin");
 const Build = std.Build;
 
 // Must match `minimum_zig_version` in `build.zig.zon`:
-const minimum_zig_version = std.SemanticVersion.parse("0.14.0") catch unreachable;
+const minimum_zig_version = std.SemanticVersion.parse("0.15.1") catch unreachable;
 
 pub fn build(b: *Build) !void {
     if (comptime builtin.zig_version.order(minimum_zig_version).compare(.lt)) {
@@ -61,15 +61,15 @@ pub fn build(b: *Build) !void {
         }),
     });
 
-    // NOTE: Using `addWriteFiles` will bloat the cache directory, but
-    // eventually I want to do additional processing on the bookmarklets, so
-    // `addWriteFiles` is the correct choice.
+    // NOTE: `export_exe` processes *all* files under a given directory, so use
+    // `addWriteFiles` to copy the bookmarklet files to a *separate* directory.
+    // `addWriteFiles` tends to bloat the cache, but users can always clear it.
     const bookmarklets = b.addWriteFiles();
-    b.getInstallStep().dependOn(&b.addInstallDirectory(.{
+    b.installDirectory(.{
         .source_dir = bookmarklets.getDirectory(),
         .install_dir = .prefix,
         .install_subdir = "",
-    }).step);
+    });
 
     const build_root = b.build_root.handle;
     var source_dir = try build_root.openDir("src", .{ .iterate = true });
