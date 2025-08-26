@@ -6,7 +6,7 @@ const ziggy = @import("ziggy");
 const Map = ziggy.dynamic.Map;
 
 pub fn main() !void {
-    var arena_state = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    var arena_state: std.heap.ArenaAllocator = .init(std.heap.page_allocator);
     defer arena_state.deinit();
     const arena = arena_state.allocator();
 
@@ -142,8 +142,8 @@ const Export = struct {
             const name = entry.name;
             const metadata = fields.get(name);
             switch (entry.kind) {
-                .directory => try self.exportDir(dir, name, try Folder.from(metadata)),
-                .file => try self.exportFile(dir, name, try Bookmarklet.from(metadata)),
+                .directory => try self.exportDir(dir, name, try .from(metadata)),
+                .file => try self.exportFile(dir, name, try .from(metadata)),
                 else => continue,
             }
         }

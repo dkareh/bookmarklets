@@ -3,7 +3,7 @@ const Child = std.process.Child;
 const run = Child.run;
 
 pub fn main() !void {
-    var arena_state = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    var arena_state: std.heap.ArenaAllocator = .init(std.heap.page_allocator);
     defer arena_state.deinit();
     const arena = arena_state.allocator();
 
