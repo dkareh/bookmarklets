@@ -11,7 +11,6 @@
             "wayback_machine.js": Bookmarklet { .title = "Wayback Machine" },
         },
     },
-    "clear_timers.js": Bookmarklet { .title = "Clear Timers" },
     "convert": Folder {
         .title = "Convert",
         .items = {
@@ -58,16 +57,12 @@
             "translate_selection.js": Bookmarklet { .title = "Translate Selection" },
         },
     },
-    "kill_sticky.js": Bookmarklet { .title = "Kill Sticky" },
     "qobuz": Folder {
         .title = "Qobuz",
         .items = {
             "download_album.js": Bookmarklet { .title = "Download Album" },
         },
     },
-    "reddit.js": Bookmarklet { .title = "Reddit" },
-    "repl.js": Bookmarklet { .title = "REPL" },
-    "restore_paste.js": Bookmarklet { .title = "Restore Paste" },
     "sci_hub": Folder {
         .title = "Sci-Hub",
         .items = {
@@ -85,6 +80,16 @@
             "export_shader.js": Bookmarklet { .title = "Export Shader" },
             "import_shader.js": Bookmarklet { .title = "Import Shader" },
             "load_textures.js": Bookmarklet { .title = "Load Textures" },
+        },
+    },
+    "utilities": Folder {
+        .title = "Utilities",
+        .items = {
+            "clear_timers.js": Bookmarklet { .title = "Clear Timers" },
+            "kill_sticky.js": Bookmarklet { .title = "Kill Sticky" },
+            "reddit.js": Bookmarklet { .title = "Reddit" },
+            "repl.js": Bookmarklet { .title = "REPL" },
+            "restore_paste.js": Bookmarklet { .title = "Restore Paste" },
         },
     },
     "web_development": Folder {
