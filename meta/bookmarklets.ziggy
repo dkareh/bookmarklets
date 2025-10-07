@@ -86,6 +86,8 @@
         .title = "Utilities",
         .items = {
             "clear_timers.js": Bookmarklet { .title = "Clear Timers" },
+            "copy_link_html.js": Bookmarklet { .title = "Copy Link (HTML)" },
+            "copy_link_markdown.js": Bookmarklet { .title = "Copy Link (Markdown)" },
             "kill_sticky.js": Bookmarklet { .title = "Kill Sticky" },
             "reddit.js": Bookmarklet { .title = "Reddit" },
             "repl.js": Bookmarklet { .title = "REPL" },
