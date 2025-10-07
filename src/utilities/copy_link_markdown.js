@@ -1,7 +1,9 @@
 // Based on https://hamatti.org/posts/my-most-used-bookmarklets/
 // Reference: https://spec.commonmark.org/0.31.2/
 (async () => {
-    const title = escapeAsciiPunctuation(removeLineEndings(document.title));
+    // NOTE: `document.title` cannot contain newlines:
+    // https://html.spec.whatwg.org/multipage/dom.html#document.title
+    const title = escapeAsciiPunctuation(document.title);
     const text = `[${title}](${escapeLinkDestination(location.href)})`;
 
     // NOTE: Browsers don't support `text/markdown`.
@@ -21,13 +23,6 @@
     function escapeAsciiPunctuation(string) {
         const asciiPunctuation = /[\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/g;
         return string.replaceAll(asciiPunctuation, (character) => `\\${character}`);
-    }
-
-    // Remove line endings by converting them to spaces, similar to the way in
-    // which CommonMark normalizes the contents of code spans.
-    function removeLineEndings(string) {
-        const lineEndings = /\r\n|[\r\n]/g;
-        return string.replaceAll(lineEndings, " ");
     }
 
     function escapeLinkDestination(string) {
