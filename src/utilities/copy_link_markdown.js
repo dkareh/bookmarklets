@@ -4,7 +4,10 @@
     // NOTE: `document.title` cannot contain newlines:
     // https://html.spec.whatwg.org/multipage/dom.html#document.title
     const title = escapeAsciiPunctuation(document.title);
-    const text = `[${title}](${escapeLinkDestination(location.href)})`;
+    const selection = getSelection();
+    const ranges = selection ? getRanges(selection) : [];
+    const quotes = ranges.map((range) => `${quoteRange(range)}\n\n`).join("");
+    const text = `${quotes}[${title}](${escapeLinkDestination(location.href)})`;
 
     // NOTE: Browsers don't support `text/markdown`.
     if (ClipboardItem.supports("text/plain; charset=UTF-8")) {
@@ -34,5 +37,21 @@
     function percentEncode(character) {
         const byte = character.codePointAt(0);
         return `%${byte.toString(16).padStart(2, "0").toUpperCase()}`;
+    }
+
+    function collapse(string) {
+        return string.trim().replaceAll(/\s+/g, " ");
+    }
+
+    function quoteRange(range) {
+        const string = range.toString();
+        return `> ${escapeAsciiPunctuation(collapse(string))}`;
+    }
+
+    function getRanges(selection) {
+        const ranges = [];
+        for (let i = 0; i < selection.rangeCount; ++i)
+            ranges.push(selection.getRangeAt(i));
+        return ranges;
     }
 })();

@@ -1,11 +1,30 @@
 // Based on https://hamatti.org/posts/my-most-used-bookmarklets/
 (async () => {
+    function getRanges(selection) {
+        const ranges = [];
+        for (let i = 0; i < selection.rangeCount; ++i)
+            ranges.push(selection.getRangeAt(i));
+        return ranges;
+    }
+
     // Use DOM APIs to automatically escape metacharacters.
+    const container = document.createElement("div");
+    const selection = getSelection();
+    if (selection) {
+        for (const range of getRanges(selection)) {
+            const blockquote = document.createElement("blockquote");
+            blockquote.textContent = range.toString();
+            blockquote.cite = location.href;
+            container.append(blockquote);
+        }
+    }
+
     const anchor = document.createElement("a");
     anchor.textContent = document.title;
     anchor.href = location.href;
-    const text = anchor.outerHTML;
+    container.append(anchor);
 
+    const text = container.innerHTML;
     const mimeTypes = ["text/html", "text/plain"];
     const mimeTypesUtf8 = mimeTypes.map((type) => `${type}; charset=UTF-8`);
     // The HTML and plain text formats should be interpreted using the same
