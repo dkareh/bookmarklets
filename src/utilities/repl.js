@@ -5,7 +5,15 @@
         function: (func) => func.toString(),
         number: (number) => number.toString(),
         object: inspectObject,
-        string: (string) => quote(string),
+        string: (string) => {
+            // Check if `string` has exactly one code point.
+            const [initial, next] = string;
+            if (initial && !next) {
+                const hex = initial.codePointAt(0).toString(16).padStart(4, "0");
+                return `${quote(initial)} (U+${hex.toUpperCase()})`;
+            }
+            return quote(string);
+        },
         symbol: (symbol) => `Symbol(${quote(symbol.description)})`,
         undefined: () => "undefined",
     };
