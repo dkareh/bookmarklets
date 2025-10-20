@@ -204,7 +204,7 @@
         return `[${inspect(key)}]`;
     }
 
-    for (let code = `[..."Hello! \\u{1F600}"].join("·")`; ; ) {
+    for (let code = String.raw`[..."Hello! \u{1F600}"].join("·")`; ; ) {
         // Read the next block of code to evaluate.
         code = prompt("Enter code:", code);
         if (code == null) break;
