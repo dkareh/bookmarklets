@@ -204,28 +204,42 @@
         return `[${inspect(key)}]`;
     }
 
+    function evaluate(code) {
+        try {
+            // Use `?.` (optional chaining) to force indirect `eval`.
+            const value = eval?.(`"use strict"; ${code}`);
+            return { tag: "success", value };
+        } catch (error) {
+            return { tag: "error", error };
+        }
+    }
+
+    function format(result) {
+        try {
+            try {
+                if (result.tag == "success") {
+                    return `✔ ${inspect(result.value)}`;
+                } else {
+                    return `✘ ${result.error}`;
+                }
+            } catch (error) {
+                // Show the user the internal REPL error instead of quitting.
+                // Use Unicode VS15 (U+FE0E) to request text presentation.
+                return `\u2757\uFE0E ${error}`;
+            }
+        } catch {
+            return "\u2757\uFE0E\u2757\uFE0E Internal error";
+        }
+    }
+
     for (let code = String.raw`[..."Hello! \u{1F600}"].join("·")`; ; ) {
         // Read the next block of code to evaluate.
         code = prompt("Enter code:", code);
         if (code == null) break;
 
-        // Evaluate the code.
-        let result;
-        try {
-            // Use `?.` (optional chaining) to force indirect `eval`.
-            result = eval?.(`"use strict"; ${code}`);
-            try {
-                result = "✔ " + inspect(result);
-            } catch (error) {
-                // Show the user the internal REPL error instead of quitting.
-                // Use Unicode VS15 (U+FE0E) to request text presentation.
-                result = "\u2757\uFE0E " + error;
-            }
-        } catch (error) {
-            result = "✘ " + error;
-        }
+        const result = evaluate(code);
 
         // Present the result, and allow the user to quit.
-        if (!confirm(result)) break;
+        if (!confirm(format(result))) break;
     }
 })();
