@@ -22,13 +22,6 @@
             "text_to_bytes.js": Bookmarklet { .title = "Text 🡒 Bytes" },
         },
     },
-    "deepl": Folder {
-        .title = "DeepL",
-        .items = {
-            "translate.js": Bookmarklet { .title = "Translate" },
-            "translate_selection.js": Bookmarklet { .title = "Translate Selection" },
-        },
-    },
     "desmos": Folder {
         .title = "Desmos",
         .items = {
