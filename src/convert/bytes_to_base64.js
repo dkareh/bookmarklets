@@ -22,11 +22,7 @@
         bytes[i] = parseInt(currentDigits, radix);
     }
 
-    // https://developer.mozilla.org/en-US/docs/Glossary/Base64
-    const fromCodePoint = (byte) => String.fromCodePoint(byte);
-    const byteString = Array.from(bytes, fromCodePoint).join("");
-    const base64 = btoa(byteString);
-
+    const base64 = bytes.toBase64();
     if (digits.length % digitsPerByte == 0) {
         alert(base64);
     } else {
