@@ -2,7 +2,9 @@
 for (const button of document.querySelectorAll(
     [
         "button[aria-label='Toggle diff contents'][aria-expanded='true']",
-        "button[aria-label^='Collapse file: ' i]",
+        `div[class*="DiffFileHeader-module__diff-file-header"]` +
+            `:not([class*="DiffFileHeader-module__collapsed"])` +
+            ` > div:nth-of-type(1) > button`,
     ].join(", "),
 )) {
     button.click();
