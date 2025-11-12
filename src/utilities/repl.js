@@ -182,7 +182,7 @@
         const char = String.fromCodePoint(code);
         if (!escapeSequences.has(char)) {
             const hex = code.toString(16).padStart(2, "0").toUpperCase();
-            escapeSequences.set(char, "\\u{" + hex + "}");
+            escapeSequences.set(char, `\\x${hex}`);
         }
     }
 
