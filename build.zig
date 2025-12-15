@@ -2,8 +2,9 @@ const std = @import("std");
 const builtin = @import("builtin");
 const Build = std.Build;
 
-// Must match `minimum_zig_version` in `build.zig.zon`:
-const minimum_zig_version = std.SemanticVersion.parse("0.15.1") catch unreachable;
+const minimum_zig_version = std.SemanticVersion.parse(
+    @import("build.zig.zon").minimum_zig_version,
+) catch unreachable;
 
 pub fn build(b: *Build) !void {
     if (comptime builtin.zig_version.order(minimum_zig_version).compare(.lt)) {
