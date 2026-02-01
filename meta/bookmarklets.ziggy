@@ -63,8 +63,8 @@
             "sci_hub_box.js": Bookmarklet { .title = "Sci-Hub (box)" },
             "sci_hub_red.js": Bookmarklet { .title = "Sci-Hub (red)" },
             "sci_hub_ru.js": Bookmarklet { .title = "Sci-Hub (ru)" },
-            "sci_hub_se.js": Bookmarklet { .title = "Sci-Hub (se)" },
             "sci_hub_st.js": Bookmarklet { .title = "Sci-Hub (st)" },
+            "sci_hub_su.js": Bookmarklet { .title = "Sci-Hub (su)" },
         },
     },
     "shadertoy": Folder {

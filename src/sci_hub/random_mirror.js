@@ -3,8 +3,8 @@
         "https://sci-hub.box/",
         "https://sci-hub.red/",
         "https://sci-hub.ru/",
-        "https://sci-hub.se/",
         "https://sci-hub.st/",
+        "https://sci-hub.su/",
     ];
     const chosenIndex = Math.floor(Math.random() * mirrors.length);
     const chosenMirror = mirrors[chosenIndex];
