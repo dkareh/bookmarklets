@@ -56,7 +56,7 @@
             if (Number.isNaN(object.getTime())) return 'Date { "Invalid Date" }';
             return `Date { ${quote(object.toISOString())} }`;
         }
-        if (object instanceof Error) {
+        if (isError(object)) {
             const name = object.name ?? "Error";
             return `${name} { message: ${quote(object.message)} }`;
         }
@@ -92,6 +92,16 @@
         const tag = object[Symbol.toStringTag]?.concat(" ") ?? "";
         // Don't output two spaces in an empty object.
         return tag + (props == "" ? `{ }` : `{ ${props} }`);
+    }
+
+    function isError(object) {
+        if (!Error.isError) return object instanceof Error;
+        // In WebKit, `Error.isError` returns `false` for `DOMException` instances.
+        const checkForDOMException = !Error.isError(new DOMException());
+        return (
+            Error.isError(object) ||
+            (checkForDOMException && object instanceof DOMException)
+        );
     }
 
     function inspectProp([key, value]) {
