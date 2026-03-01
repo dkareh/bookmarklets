@@ -8,24 +8,8 @@
     const link = document.querySelector("#all-tracks .product-title a");
     const name = link.pathname.split("/")[3];
 
-    // Assume that all tracks are available in the same formats.
-    const selector = document.querySelector("#all-tracks select");
-    const formats = [...selector.options].map((option) => option.label);
-    let preferredIndex;
-    for (;;) {
-        const list = formats.map((format, i) => i + 1 + ". " + format).join("\n");
-        const response = prompt("Enter index of preferred format:\n" + list, "1");
-        if (response == null) return;
-
-        const index = parseInt(response, 10);
-        if (!Number.isNaN(index) && 1 <= index && index <= formats.length) {
-            preferredIndex = index - 1;
-            break;
-        }
-    }
-
-    // Assume that available formats are always assigned the same codes.
-    const preferredFormat = selector.options[preferredIndex].value;
+    const preferredFormat = requestPreferredFormat();
+    if (preferredFormat == null) return;
     const sources = await getTrackSources(preferredFormat);
     sources.push(getCoverSource(name));
 
@@ -183,5 +167,27 @@
         put(checksum, 148, 8);
 
         return header;
+    }
+
+    // Request the user's preferred format (e.g. CD Quality, Standard Quality).
+    function requestPreferredFormat() {
+        // Assume that all tracks are available in the same formats.
+        const selector = document.querySelector("#all-tracks select");
+        const formats = [...selector.options].map((option) => option.label);
+        let preferredIndex;
+        for (;;) {
+            const list = formats.map((format, i) => i + 1 + ". " + format).join("\n");
+            const response = prompt("Enter index of preferred format:\n" + list, "1");
+            if (response == null) return null;
+
+            const index = parseInt(response, 10);
+            if (!Number.isNaN(index) && 1 <= index && index <= formats.length) {
+                preferredIndex = index - 1;
+                break;
+            }
+        }
+
+        // Assume that available formats are always assigned the same codes.
+        return selector.options[preferredIndex].value;
     }
 })();
