@@ -8,12 +8,17 @@
             .url = "https://github.com/kristoff-it/ziggy/archive/4353b20ef2ac750e35c6d68e4eb2a07c2d7cf901.tar.gz",
             .hash = "ziggy-0.1.0-kTg8v5pABgDztlefWHceH-Sh8tVveguFC61QkmLkIRaA",
         },
+        .minify = .{
+            .path = "pkg/minify",
+            .lazy = true,
+        },
     },
     .paths = .{
         "build",
         "build.zig",
         "build.zig.zon",
         "meta",
+        "pkg",
         "src",
     },
 }

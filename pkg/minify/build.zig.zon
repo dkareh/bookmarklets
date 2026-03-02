@@ -1,0 +1,52 @@
+.{
+    .name = .minify,
+    .version = "2.24.10",
+    .fingerprint = 0x170bdd3d22078174,
+    .minimum_zig_version = "0.15.1",
+    .dependencies = .{
+        .darwin_aarch64 = .{
+            .url = "https://github.com/tdewolff/minify/releases/download/v2.24.10/minify_darwin_arm64.tar.gz",
+            .hash = "N-V-__8AAOGmTABp51Nrq4G5HfmTzdolOBrOgbjFHCk3MBJh",
+            .lazy = true,
+        },
+        .darwin_x86_64 = .{
+            .url = "https://github.com/tdewolff/minify/releases/download/v2.24.10/minify_darwin_amd64.tar.gz",
+            .hash = "N-V-__8AAH_AUQAZNk4D5Pp2_BG2DkmWU3M0WO3mADOKg36M",
+            .lazy = true,
+        },
+        .freebsd_x86_64 = .{
+            .url = "https://github.com/tdewolff/minify/releases/download/v2.24.10/minify_freebsd_amd64.tar.gz",
+            .hash = "N-V-__8AALt0TwD8lr8mFm0vD7QdRrBJN7D8B4VMAn6v9KXj",
+            .lazy = true,
+        },
+        .linux_aarch64 = .{
+            .url = "https://github.com/tdewolff/minify/releases/download/v2.24.10/minify_linux_arm64.tar.gz",
+            .hash = "N-V-__8AALE0SwBCWWJDgP-vEWA4VzAH_1Em7d8SnX8pZkhr",
+            .lazy = true,
+        },
+        .linux_x86_64 = .{
+            .url = "https://github.com/tdewolff/minify/releases/download/v2.24.10/minify_linux_amd64.tar.gz",
+            .hash = "N-V-__8AALEkUACOdbQX0R-IJxfShyh5FglDSrUqf1BLIgoL",
+            .lazy = true,
+        },
+        .netbsd_x86_64 = .{
+            .url = "https://github.com/tdewolff/minify/releases/download/v2.24.10/minify_netbsd_amd64.tar.gz",
+            .hash = "N-V-__8AAMQETwDwTSYWZbPuJ-wqJdDCWjyJGuZb_mxUhT3U",
+            .lazy = true,
+        },
+        .openbsd_x86_64 = .{
+            .url = "https://github.com/tdewolff/minify/releases/download/v2.24.10/minify_openbsd_amd64.tar.gz",
+            .hash = "N-V-__8AACylTwBhkYPE9h-OfKSt_ZeMzgd9YK37EI-NDIiu",
+            .lazy = true,
+        },
+        .windows_x86_64 = .{
+            .url = "https://github.com/tdewolff/minify/releases/download/v2.24.10/minify_windows_amd64.zip",
+            .hash = "N-V-__8AAO7mUwDbwV0fIISrdxOWyAadahSrrq6_d59EFNuE",
+            .lazy = true,
+        },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+    },
+}
