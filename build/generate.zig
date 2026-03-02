@@ -1,5 +1,6 @@
 const std = @import("std");
 const Child = std.process.Child;
+const fatal = std.process.fatal;
 const run = Child.run;
 
 pub fn main() !void {
@@ -9,20 +10,17 @@ pub fn main() !void {
 
     const args = try std.process.argsAlloc(arena);
     const minify_command_path = if (1 < args.len) args[1] else {
-        std.log.err("path to `minify` command not provided", .{});
-        return error.NoMinifyCommandPath;
+        fatal("path to `minify` command not provided", .{});
     };
 
     const source_path = if (2 < args.len) args[2] else {
-        std.log.err("no source path provided", .{});
-        return error.NoSourcePath;
+        fatal("no source path provided", .{});
     };
 
     const argv = .{ minify_command_path, "--type", "js", "--", source_path };
     const result = try run(.{ .allocator = arena, .argv = &argv });
     if (result.stderr.len != 0) {
-        std.log.err("unexpected error message:\n{s}", .{result.stderr});
-        return error.UnexpectedErrorMessage;
+        fatal("unexpected error message:\n{s}", .{result.stderr});
     }
 
     var stdout_buffer: [4096]u8 = undefined;

@@ -1,5 +1,6 @@
 const std = @import("std");
 const assert = std.debug.assert;
+const fatal = std.process.fatal;
 const fs = std.fs;
 
 const ziggy = @import("ziggy");
@@ -11,9 +12,8 @@ pub fn main() !void {
     const arena = arena_state.allocator();
 
     const args = try std.process.argsAlloc(arena);
-    const root_path = if (args.len > 1) args[1] else {
-        std.log.err("no root path provided", .{});
-        return error.NoRootPath;
+    const root_path = if (1 < args.len) args[1] else {
+        fatal("no root path provided", .{});
     };
 
     // Read the bookmarklets metadata.
