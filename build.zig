@@ -43,6 +43,12 @@ pub fn build(b: *Build) !void {
         // Don't quit just because the user hasn't installed Biome.
     }
 
+    const minify_command_path = b.findProgram(&.{"minify"}, &.{}) catch {
+        const message = "`minify` command not found";
+        b.getInstallStep().dependOn(&b.addFail(message).step);
+        return;
+    };
+
     const generate_exe = b.addExecutable(.{
         .name = "generate",
         .root_module = b.createModule(.{
@@ -83,6 +89,7 @@ pub fn build(b: *Build) !void {
             continue;
 
         const generate_run = b.addRunArtifact(generate_exe);
+        generate_run.addFileArg(.{ .cwd_relative = minify_command_path });
         generate_run.addFileArg(b.path("src").path(b, entry.path));
 
         const output_path = generate_run.captureStdOut();

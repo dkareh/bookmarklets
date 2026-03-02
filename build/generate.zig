@@ -8,12 +8,17 @@ pub fn main() !void {
     const arena = arena_state.allocator();
 
     const args = try std.process.argsAlloc(arena);
-    const source_path = if (args.len > 1) args[1] else {
+    const minify_command_path = if (1 < args.len) args[1] else {
+        std.log.err("path to `minify` command not provided", .{});
+        return error.NoMinifyCommandPath;
+    };
+
+    const source_path = if (2 < args.len) args[2] else {
         std.log.err("no source path provided", .{});
         return error.NoSourcePath;
     };
 
-    const argv = .{ "minify", "--type", "js", source_path };
+    const argv = .{ minify_command_path, "--type", "js", "--", source_path };
     const result = try run(.{ .allocator = arena, .argv = &argv });
     if (result.stderr.len != 0) {
         std.log.err("unexpected error message:\n{s}", .{result.stderr});
