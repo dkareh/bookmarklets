@@ -44,6 +44,20 @@ fn indexOfUnsafeByte(bytes: []const u8) ?usize {
     return null;
 }
 
+// Adapted from `std.Build.Step.Run`:
+fn formatTerm(term: Child.Term, writer: *std.Io.Writer) std.Io.Writer.Error!void {
+    switch (term) {
+        .Exited => |code| try writer.print("exited (code {d})", .{code}),
+        .Signal => |signal| try writer.print("terminated (signal {d})", .{signal}),
+        .Stopped => |signal| try writer.print("stopped (signal {d})", .{signal}),
+        .Unknown => |code| try writer.print("terminated for unknown reason (code {d})", .{code}),
+    }
+}
+
+fn fmtTerm(term: Child.Term) std.fmt.Alt(Child.Term, formatTerm) {
+    return .{ .data = term };
+}
+
 fn reportErrors(result: Child.RunResult) !?u8 {
     const messages = std.mem.trim(u8, result.stderr, &std.ascii.whitespace);
     if (messages.len != 0) {
@@ -52,7 +66,12 @@ fn reportErrors(result: Child.RunResult) !?u8 {
         const stderr = &stderr_writer.interface;
         try stderr.print("{s}\n", .{messages});
         try stderr.flush();
-        return 1;
     }
-    return null;
+    const term_unexpected = switch (result.term) {
+        .Exited => |code| code != 0,
+        .Signal, .Stopped, .Unknown => true,
+    };
+    if (term_unexpected)
+        std.log.err("`minify` unexpectedly {f}", .{fmtTerm(result.term)});
+    return if (messages.len != 0 or term_unexpected) 1 else null;
 }
