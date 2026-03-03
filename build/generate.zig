@@ -3,7 +3,7 @@ const Child = std.process.Child;
 const fatal = std.process.fatal;
 const run = Child.run;
 
-pub fn main() !void {
+pub fn main() !u8 {
     var arena_state: std.heap.ArenaAllocator = .init(std.heap.page_allocator);
     defer arena_state.deinit();
     const arena = arena_state.allocator();
@@ -19,9 +19,7 @@ pub fn main() !void {
 
     const argv = .{ minify_command_path, "--type", "js", "--", source_path };
     const result = try run(.{ .allocator = arena, .argv = &argv });
-    if (result.stderr.len != 0) {
-        fatal("unexpected error message:\n{s}", .{result.stderr});
-    }
+    if (try reportErrors(result)) |code| return code;
 
     var stdout_buffer: [4096]u8 = undefined;
     var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
@@ -35,12 +33,26 @@ pub fn main() !void {
     }
     try stdout.writeAll(remaining);
     try stdout.flush();
+    return 0;
 }
 
 fn indexOfUnsafeByte(bytes: []const u8) ?usize {
     for (bytes, 0..) |byte, i| {
         if (std.ascii.isControl(byte) or byte == '%')
             return i;
+    }
+    return null;
+}
+
+fn reportErrors(result: Child.RunResult) !?u8 {
+    const messages = std.mem.trim(u8, result.stderr, &std.ascii.whitespace);
+    if (messages.len != 0) {
+        var stderr_buffer: [4096]u8 = undefined;
+        var stderr_writer = std.fs.File.stderr().writer(&stderr_buffer);
+        const stderr = &stderr_writer.interface;
+        try stderr.print("{s}\n", .{messages});
+        try stderr.flush();
+        return 1;
     }
     return null;
 }

@@ -104,6 +104,7 @@ pub fn build(b: *Build) !void {
         const generate_run = b.addRunArtifact(generate_exe);
         generate_run.addFileArg(minify_command_path);
         generate_run.addFileArg(b.path("src").path(b, entry.path));
+        generate_run.expectExitCode(0);
 
         const output_path = generate_run.captureStdOut();
         _ = bookmarklets.addCopyFile(output_path, entry.path);
