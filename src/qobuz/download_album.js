@@ -66,17 +66,17 @@
     }
 
     // Download each element of `sources`.
-    async function downloadSources(sources) {
-        const entries = [];
-        // Download sources one at a time.
-        for (const source of sources) {
-            const response = await fetch(source.url);
-            if (!response.ok) throw Error(`${response.status} from ${source.url}`);
-            const blob = await response.blob();
-            const extension = getExtension(blob.type);
-            entries.push({ blob, name: source.name + extension });
-        }
-        return entries;
+    function downloadSources(sources) {
+        return Promise.all(sources.map(downloadSource));
+    }
+
+    // Download `source`, returning a blob and appending an extension.
+    async function downloadSource(source) {
+        const response = await fetch(source.url);
+        if (!response.ok) throw Error(`${response.status} from ${source.url}`);
+        const blob = await response.blob();
+        const extension = getExtension(blob.type);
+        return { blob, name: source.name + extension };
     }
 
     // Get a typical extension for a MIME type.
