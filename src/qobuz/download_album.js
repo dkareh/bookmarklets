@@ -10,11 +10,14 @@
 
     const preferredFormat = requestPreferredFormat();
     if (preferredFormat == null) return;
-    const sources = await getTrackSources(preferredFormat);
-    sources.push(getCoverSource(name));
 
     // Download the sources.
-    const entries = await downloadSources(sources);
+    const entries = await Promise.all(
+        getTrackPointers(preferredFormat)
+            .map(getTrackSource)
+            .concat(Promise.try(getCoverSource, name))
+            .map((source) => source.then(downloadSource)),
+    );
 
     // Download a tar archive.
     const archive = createTarArchive(name, entries);
@@ -45,11 +48,6 @@
         });
     }
 
-    // Scrape tracks from the webpage, and fetch sources.
-    function getTrackSources(preferredFormat) {
-        return Promise.all(getTrackPointers(preferredFormat).map(getTrackSource));
-    }
-
     // Get the location of one album track via its pointer URI.
     async function getTrackSource({ uri, name }) {
         const response = await fetch(uri);
@@ -63,11 +61,6 @@
     function getCoverSource(name) {
         const cover = document.querySelector("#all-tracks tr:has(.icon-picture) a");
         return { url: cover.href, name };
-    }
-
-    // Download each element of `sources`.
-    function downloadSources(sources) {
-        return Promise.all(sources.map(downloadSource));
     }
 
     // Download `source`, returning a blob and appending an extension.
