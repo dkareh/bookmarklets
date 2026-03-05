@@ -28,11 +28,9 @@
     URL.revokeObjectURL(anchor.href);
 
     // Scrape tracks from the webpage.
-    async function getTrackSources(preferredFormat) {
+    function getTrackPointers(preferredFormat) {
         const rows = document.querySelectorAll("#all-tracks tr:has(a.tracks)");
-
-        const sources = [];
-        for (const row of rows) {
+        return Array.from(rows).map((row) => {
             const link = row.querySelector("a.tracks");
             const match = link.id.match(/^tracks_id(?<disc>\d+)-(?<track>\d+)$/);
             const { disc, track } = match.groups;
@@ -42,15 +40,23 @@
             // Insert spaces before brackets and parentheses.
             name = name.replaceAll(/\S(?=[[(])/g, "$& ");
 
-            // Send one request at a time.
             const uri = link.dataset.uri.replace("/xx", "/" + preferredFormat);
-            const response = await fetch(uri);
-            if (!response.ok) throw Error(`${response.status} from ${uri}`);
-            const json = await response.json();
-            if (!json || !Object.hasOwn(json, "url")) throw Error("Missing `url` key");
-            sources.push({ url: json.url, name });
-        }
-        return sources;
+            return { uri, name };
+        });
+    }
+
+    // Scrape tracks from the webpage, and fetch sources.
+    function getTrackSources(preferredFormat) {
+        return Promise.all(getTrackPointers(preferredFormat).map(getTrackSource));
+    }
+
+    // Get the location of one album track via its pointer URI.
+    async function getTrackSource({ uri, name }) {
+        const response = await fetch(uri);
+        if (!response.ok) throw Error(`${response.status} from ${uri}`);
+        const json = await response.json();
+        if (!json || !Object.hasOwn(json, "url")) throw Error("Missing `url` key");
+        return { url: json.url, name };
     }
 
     // Get the location of the album cover.
