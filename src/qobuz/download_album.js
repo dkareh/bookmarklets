@@ -45,10 +45,9 @@
             // Send one request at a time.
             const uri = link.dataset.uri.replace("/xx", "/" + preferredFormat);
             const response = await fetch(uri);
-            if (!response.ok) continue;
-
+            if (!response.ok) throw Error(`${response.status} from ${uri}`);
             const json = await response.json();
-            if (!json || !Object.hasOwn(json, "url")) continue;
+            if (!json || !Object.hasOwn(json, "url")) throw Error("Missing `url` key");
             sources.push({ url: json.url, name });
         }
         return sources;
@@ -66,7 +65,7 @@
         // Download sources one at a time.
         for (const source of sources) {
             const response = await fetch(source.url);
-            if (!response.ok) continue;
+            if (!response.ok) throw Error(`${response.status} from ${source.url}`);
             const blob = await response.blob();
             const extension = getExtension(blob.type);
             entries.push({ blob, name: source.name + extension });
