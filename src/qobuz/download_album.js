@@ -13,15 +13,20 @@
     if (preferredFormat == null) return;
 
     // Download the sources.
+    const progress = createProgressBar();
     const limit = limitConcurrency(CONCURRENT_FETCH_DEGREE);
-    const fetchJsonDecorated = limit(fetchJson);
-    const fetchBlobDecorated = limit(fetchBlob);
-    const entries = await Promise.all(
+    const fetchJsonDecorated = progress.track(limit(fetchJson));
+    const fetchBlobDecorated = progress.track(limit(fetchBlob));
+    const entriesPromise = Promise.all(
         getTrackPointers(preferredFormat)
             .map(getTrackSource.bind(null, fetchJsonDecorated))
             .concat(Promise.try(getCoverSource, name))
             .map((source) => source.then(downloadSource.bind(null, fetchBlobDecorated))),
     );
+
+    const entries = await Promise.try(() => document.body.append(progress.element))
+        .then(() => entriesPromise)
+        .finally(() => progress.element.remove());
 
     // Download a tar archive.
     const archive = createTarArchive(name, entries);
@@ -201,6 +206,27 @@
 
         // Assume that available formats are always assigned the same codes.
         return selector.options[preferredIndex].value;
+    }
+
+    // Return the HTML element and `track`. `track` wraps a function, returning
+    // a new function which will update the progress bar upon completion.
+    function createProgressBar() {
+        const element = document.createElement("progress");
+        element.style.position = "fixed";
+        element.style.inset = "auto 0 0 0";
+        element.style.background = "#E9E9ED";
+
+        let max = 0; // NOTE: `element.max` must be positive.
+        element.value = 0;
+
+        function track(original) {
+            return (...args) => {
+                element.max = ++max;
+                return Promise.try(original, ...args).finally(() => element.value++);
+            };
+        }
+
+        return { element, track };
     }
 
     // Wrap asynchronous functions to limit the concurrency of created tasks.
