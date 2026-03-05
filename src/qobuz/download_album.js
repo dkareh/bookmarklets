@@ -14,9 +14,9 @@
     // Download the sources.
     const entries = await Promise.all(
         getTrackPointers(preferredFormat)
-            .map(getTrackSource)
+            .map(getTrackSource.bind(null, fetchJson))
             .concat(Promise.try(getCoverSource, name))
-            .map((source) => source.then(downloadSource)),
+            .map((source) => source.then(downloadSource.bind(null, fetchBlob))),
     );
 
     // Download a tar archive.
@@ -29,6 +29,20 @@
 
     // Immediately revoking the object URL seems to work fine.
     URL.revokeObjectURL(anchor.href);
+
+    // Fetch `url` and parse the response body as JSON.
+    async function fetchJson(url) {
+        const response = await fetch(url);
+        if (!response.ok) throw Error(`${response.status} from ${url}`);
+        return await response.json();
+    }
+
+    // Fetch `url` and yield the response body as a `Blob`.
+    async function fetchBlob(url) {
+        const response = await fetch(url);
+        if (!response.ok) throw Error(`${response.status} from ${url}`);
+        return await response.blob();
+    }
 
     // Scrape tracks from the webpage.
     function getTrackPointers(preferredFormat) {
@@ -49,10 +63,8 @@
     }
 
     // Get the location of one album track via its pointer URI.
-    async function getTrackSource({ uri, name }) {
-        const response = await fetch(uri);
-        if (!response.ok) throw Error(`${response.status} from ${uri}`);
-        const json = await response.json();
+    async function getTrackSource(fetchJson, { uri, name }) {
+        const json = await fetchJson(uri);
         if (!json || !Object.hasOwn(json, "url")) throw Error("Missing `url` key");
         return { url: json.url, name };
     }
@@ -64,10 +76,8 @@
     }
 
     // Download `source`, returning a blob and appending an extension.
-    async function downloadSource(source) {
-        const response = await fetch(source.url);
-        if (!response.ok) throw Error(`${response.status} from ${source.url}`);
-        const blob = await response.blob();
+    async function downloadSource(fetchBlob, source) {
+        const blob = await fetchBlob(source.url);
         const extension = getExtension(blob.type);
         return { blob, name: source.name + extension };
     }
