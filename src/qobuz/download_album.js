@@ -2,6 +2,7 @@
     if (location.origin != "https://www.qobuz.com") return;
     if (!/^\/account\/download\//.test(location.pathname)) return;
 
+    const CONCURRENT_FETCH_DEGREE = 3;
     // POSIX.1-2001 tar (pax) block size:
     const BLOCK_SIZE = 512;
 
@@ -12,11 +13,14 @@
     if (preferredFormat == null) return;
 
     // Download the sources.
+    const limit = limitConcurrency(CONCURRENT_FETCH_DEGREE);
+    const fetchJsonDecorated = limit(fetchJson);
+    const fetchBlobDecorated = limit(fetchBlob);
     const entries = await Promise.all(
         getTrackPointers(preferredFormat)
-            .map(getTrackSource.bind(null, fetchJson))
+            .map(getTrackSource.bind(null, fetchJsonDecorated))
             .concat(Promise.try(getCoverSource, name))
-            .map((source) => source.then(downloadSource.bind(null, fetchBlob))),
+            .map((source) => source.then(downloadSource.bind(null, fetchBlobDecorated))),
     );
 
     // Download a tar archive.
@@ -197,5 +201,32 @@
 
         // Assume that available formats are always assigned the same codes.
         return selector.options[preferredIndex].value;
+    }
+
+    // Wrap asynchronous functions to limit the concurrency of created tasks.
+    // Each call to `limitConcurrency` creates a separate limiting scope.
+    function limitConcurrency(degree) {
+        let runningCount = 0;
+        const waitQueue = [];
+
+        function acquire() {
+            // Block if too many tasks are already running.
+            if (runningCount == degree)
+                return new Promise((resolve) => waitQueue.push(resolve));
+            runningCount++;
+        }
+
+        function release() {
+            // Wake up an enqueued task.
+            const [resolve] = waitQueue.splice(0, 1);
+            resolve ? resolve() : runningCount--;
+        }
+
+        return (original) => {
+            return (...args) =>
+                Promise.try(acquire)
+                    .then(() => original(...args))
+                    .finally(release);
+        };
     }
 })();
