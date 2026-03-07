@@ -15,13 +15,13 @@
     // Download the sources.
     const progress = createProgressBar();
     const limit = limitConcurrency(CONCURRENT_FETCH_DEGREE);
-    const fetchJsonDecorated = progress.track(limit(fetchJson));
-    const fetchBlobDecorated = progress.track(limit(fetchBlob));
+    const getTrackSourceDecorated = getTrackSource.bind(null, limit(fetchJson));
+    const downloadSourceDecorated = downloadSource.bind(null, limit(fetchBlob));
     const entriesPromise = Promise.all(
         getTrackPointers(preferredFormat)
-            .map(getTrackSource.bind(null, fetchJsonDecorated))
+            .map(progress.track(getTrackSourceDecorated))
             .concat(Promise.try(getCoverSource, name))
-            .map((source) => source.then(downloadSource.bind(null, fetchBlobDecorated))),
+            .map(progress.track((source) => source.then(downloadSourceDecorated))),
     );
 
     const entries = await Promise.try(() => document.body.append(progress.element))
