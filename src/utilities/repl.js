@@ -88,10 +88,10 @@
         }
 
         // Handle regular objects.
-        const props = Object.entries(object).map(inspectProp).join(", ");
+        const properties = Object.entries(object).map(inspectProperty).join(", ");
         const tag = object[Symbol.toStringTag]?.concat(" ") ?? "";
         // Don't output two spaces in an empty object.
-        return tag + (props == "" ? `{ }` : `{ ${props} }`);
+        return tag + (properties == "" ? `{ }` : `{ ${properties} }`);
     }
 
     function isError(object) {
@@ -104,7 +104,7 @@
         );
     }
 
-    function inspectProp([key, value]) {
+    function inspectProperty([key, value]) {
         return `${inspectKey(key)}: ${inspect(value)}`;
     }
 
@@ -164,7 +164,7 @@
     function inspectMap(map) {
         // Don't output two spaces in an empty map.
         if (map.size == 0) return "Map { }";
-        const entries = [...map].map(inspectProp);
+        const entries = [...map].map(inspectProperty);
         return `Map { ${entries.join(", ")} }`;
     }
 
