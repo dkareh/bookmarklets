@@ -61,7 +61,9 @@
             return `${isolateLtr(name)} { message: ${quote(object.message)} }`;
         }
         if (object instanceof RegExp) {
-            return isolateLtr(object.toString());
+            // `\b` is reserved for word boundaries.
+            const escaped = escape(object.toString().replaceAll("\b", "\\x08"));
+            return isolateLtr(escaped, { sanitize: false });
         }
         if (Object.prototype.toString.call(object) == "[object Arguments]") {
             // `object` is *probably* an arguments array-like object.
@@ -176,8 +178,7 @@
     }
 
     const escapeSequences = new Map([
-        ['"', '\\"'],
-        ["\\", "\\\\"],
+        // ASCII control characters:
         ["\b", "\\b"],
         ["\t", "\\t"],
         ["\n", "\\n"],
@@ -210,8 +211,9 @@
     }
 
     function quote(string) {
+        const escaped = escape(string.replaceAll(/["\\]/g, (char) => `\\${char}`));
         // `escape` already removes directional formatting characters.
-        return `"${isolateLtr(escape(string), { sanitize: false })}"`;
+        return `"${isolateLtr(escaped, { sanitize: false })}"`;
     }
 
     function escape(string) {
