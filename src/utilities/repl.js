@@ -214,7 +214,9 @@
         return `[${inspect(key)}]`;
     }
 
-    function isolateLtr(string) {
+    function isolateLtr(string, { sanitize = true } = {}) {
+        const formattingCharacters = /[\u061C\u200E\u200F\u202A-\u202E\u2066-\u2069]/g;
+        if (sanitize) string = string.replaceAll(formattingCharacters, "");
         return `\u2066${string}\u2069`;
     }
 
@@ -232,7 +234,7 @@
         try {
             try {
                 if (result.tag == "success") {
-                    return `✔ ${isolateLtr(inspect(result.value))}`;
+                    return `✔ ${isolateLtr(inspect(result.value), { sanitize: false })}`;
                 } else {
                     return `✘ ${isolateLtr(String(result.error))}`;
                 }
