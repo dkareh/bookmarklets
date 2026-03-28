@@ -223,7 +223,10 @@
     function inspectKey(key) {
         if (typeof key == "string") {
             const identifier = /^[\p{ID_Start}$_][\p{ID_Continue}$]*$/u;
-            return identifier.test(key) ? isolateLtr(key) : quote(key);
+            // Identifiers cannot contain directional formatting characters.
+            return identifier.test(key)
+                ? isolateLtr(key, { sanitize: false })
+                : quote(key);
         }
         return `[${inspect(key)}]`;
     }
