@@ -2,7 +2,7 @@
     const inspectors = {
         bigint: (bigint) => bigint.toString() + "n",
         boolean: (boolean) => boolean.toString(),
-        function: (func) => func.toString(),
+        function: (func) => isolateLtr(func.toString()),
         number: (number) => number.toString(),
         object: inspectObject,
         string: (string) => {
@@ -58,10 +58,10 @@
         }
         if (isError(object)) {
             const name = object.name ?? "Error";
-            return `${name} { message: ${quote(object.message)} }`;
+            return `${isolateLtr(name)} { message: ${quote(object.message)} }`;
         }
         if (object instanceof RegExp) {
-            return object.toString();
+            return isolateLtr(object.toString());
         }
         if (Object.prototype.toString.call(object) == "[object Arguments]") {
             // `object` is *probably* an arguments array-like object.
@@ -83,7 +83,7 @@
                 return inspectDataView(object);
             } else {
                 const name = object.constructor.name;
-                return name + " " + inspectTypedArray(object);
+                return isolateLtr(name) + " " + inspectTypedArray(object);
             }
         }
 
@@ -91,7 +91,7 @@
         const properties = Object.entries(object).map(inspectProperty).join(", ");
         const tag = object[Symbol.toStringTag]?.concat(" ") ?? "";
         // Don't output two spaces in an empty object.
-        return tag + (properties == "" ? `{ }` : `{ ${properties} }`);
+        return isolateLtr(tag) + (properties == "" ? `{ }` : `{ ${properties} }`);
     }
 
     function isError(object) {
@@ -197,7 +197,7 @@
     }
 
     function quote(string) {
-        return `"${escape(string)}"`;
+        return `"${isolateLtr(escape(string))}"`;
     }
 
     function escape(string) {
@@ -209,9 +209,13 @@
     function inspectKey(key) {
         if (typeof key == "string") {
             const identifier = /^[\p{ID_Start}$_][\p{ID_Continue}$]*$/u;
-            return identifier.test(key) ? key : quote(key);
+            return identifier.test(key) ? isolateLtr(key) : quote(key);
         }
         return `[${inspect(key)}]`;
+    }
+
+    function isolateLtr(string) {
+        return `\u2066${string}\u2069`;
     }
 
     function evaluate(code) {
@@ -228,17 +232,17 @@
         try {
             try {
                 if (result.tag == "success") {
-                    return `✔ ${inspect(result.value)}`;
+                    return `✔ ${isolateLtr(inspect(result.value))}`;
                 } else {
-                    return `✘ ${result.error}`;
+                    return `✘ ${isolateLtr(String(result.error))}`;
                 }
             } catch (error) {
                 // Show the user the internal REPL error instead of quitting.
                 // Use Unicode VS15 (U+FE0E) to request text presentation.
-                return `\u2757\uFE0E ${error}`;
+                return `\u2757\uFE0E ${isolateLtr(String(error))}`;
             }
         } catch {
-            return "\u2757\uFE0E\u2757\uFE0E Internal error";
+            return `\u2757\uFE0E\u2757\uFE0E ${isolateLtr("Internal error")}`;
         }
     }
 
