@@ -185,6 +185,19 @@
         ["\f", "\\f"],
         ["\r", "\\r"],
         ["\x7F", "\\x7F"],
+        // Directional formatting characters:
+        ["\u061C", "\\u061C"], // Arabic letter mark
+        ["\u200E", "\\u200E"], // LTR mark
+        ["\u200F", "\\u200F"], // RTL mark
+        ["\u202A", "\\u202A"], // LTR embedding
+        ["\u202B", "\\u202B"], // RTL embedding
+        ["\u202C", "\\u202C"], // Pop directional formatting
+        ["\u202D", "\\u202D"], // LTR override
+        ["\u202E", "\\u202E"], // RTL override
+        ["\u2066", "\\u2066"], // LTR isolate
+        ["\u2067", "\\u2067"], // RTL isolate
+        ["\u2068", "\\u2068"], // 1st strong isolate
+        ["\u2069", "\\u2069"], // Pop directional isolate
     ]);
 
     // Add escape sequences for the remaining ASCII control characters.
@@ -197,7 +210,8 @@
     }
 
     function quote(string) {
-        return `"${isolateLtr(escape(string))}"`;
+        // `escape` already removes directional formatting characters.
+        return `"${isolateLtr(escape(string), { sanitize: false })}"`;
     }
 
     function escape(string) {
